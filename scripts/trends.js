@@ -16,6 +16,11 @@
 
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_DIR = path.join(__dirname, '..', 'data');
 
 const STOPWORDS = new Set([
     'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
@@ -94,7 +99,7 @@ Examples:
         process.exit(0);
     }
 
-    const scrapesDir = path.join(topic, 'Scrapes');
+    const scrapesDir = path.join(DATA_DIR, topic, 'Scrapes');
     if (!fs.existsSync(scrapesDir)) {
         console.error(`No scrapes directory found: ${scrapesDir}`);
         process.exit(1);

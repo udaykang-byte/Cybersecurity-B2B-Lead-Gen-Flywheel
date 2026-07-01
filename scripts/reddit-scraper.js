@@ -42,6 +42,7 @@ import db from './lib/supabase.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const DATA_DIR = path.join(__dirname, '..', 'data');
 
 // Load .env if available
 try {
@@ -203,7 +204,7 @@ async function getResults(datasetId) {
 function mergeAndFormat(allResults, sinceCutoff = null, topic = null, minAgeCutoff = null, skipDedup = false, supabaseSeenUrls = null) {
     const useSupabaseDedup = supabaseSeenUrls !== null;
     // Only use .seen-urls.json when Supabase is not available
-    const seenUrlsFile = (!skipDedup && topic && !useSupabaseDedup) ? path.join(topic, 'Scrapes', '.seen-urls.json') : null;
+    const seenUrlsFile = (!skipDedup && topic && !useSupabaseDedup) ? path.join(DATA_DIR, topic, 'Scrapes', '.seen-urls.json') : null;
     let previouslySeen = useSupabaseDedup ? supabaseSeenUrls : new Set();
     if (seenUrlsFile) {
         try {
@@ -418,7 +419,7 @@ async function scrapeReddit(urls, maxComments = 10, maxPosts = 10, sort = 'new',
     let outputFile;
 
     if (topic) {
-        const dir = path.join(topic, 'Scrapes');
+        const dir = path.join(DATA_DIR, topic, 'Scrapes');
         fs.mkdirSync(dir, { recursive: true });
         outputFile = path.join(dir, `${filePrefix}-${timestamp}.json`);
     } else {
@@ -513,7 +514,7 @@ async function scrapeReddit(urls, maxComments = 10, maxPosts = 10, sort = 'new',
         outputFile,
         durationMs: Date.now() - scrapeStartTime
     });
-    const logPath = path.join(__dirname, '..', 'scrape-history.jsonl');
+    const logPath = path.join(DATA_DIR, 'scrape-history.jsonl');
     fs.appendFileSync(logPath, logEntry + '\n');
 
     return formatted;
@@ -636,7 +637,7 @@ async function fetchCommentsForLeads(leadsFile, topic, tiers, maxComments = 50) 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
     let outputFile;
     if (topic) {
-        const dir = path.join(topic, 'Scrapes');
+        const dir = path.join(DATA_DIR, topic, 'Scrapes');
         fs.mkdirSync(dir, { recursive: true });
         outputFile = path.join(dir, `scrape-${timestamp}.json`);
     } else {
@@ -669,7 +670,7 @@ async function fetchCommentsForLeads(leadsFile, topic, tiers, maxComments = 50) 
         outputFile,
         durationMs: Date.now() - fetchStartTime
     });
-    const logPath = path.join(__dirname, '..', 'scrape-history.jsonl');
+    const logPath = path.join(DATA_DIR, 'scrape-history.jsonl');
     fs.appendFileSync(logPath, logEntry + '\n');
 
     return combined;

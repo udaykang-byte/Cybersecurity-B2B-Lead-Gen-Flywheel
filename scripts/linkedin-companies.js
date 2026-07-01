@@ -44,6 +44,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const DATA_DIR = path.join(__dirname, '..', 'data');
 
 // ── Load .env ──
 try {
@@ -485,7 +486,7 @@ function mergeCSVMetadata(apifyData, csvRow) {
 
 // ── Deduplication ──
 function loadSeenUrls(topic) {
-    const seenFile = topic ? path.join(topic, 'LinkedIn', '.seen-urls.json') : null;
+    const seenFile = topic ? path.join(DATA_DIR, topic, 'LinkedIn', '.seen-urls.json') : null;
     if (!seenFile) return { seen: new Set(), file: null };
     try {
         const existing = JSON.parse(fs.readFileSync(seenFile, 'utf8'));
@@ -587,7 +588,7 @@ function generateMarkdownReport(companies, meta) {
 }
 
 function appendAuditLog(entry) {
-    const logPath = path.join(__dirname, '..', 'linkedin-history.jsonl');
+    const logPath = path.join(DATA_DIR, 'linkedin-history.jsonl');
     fs.appendFileSync(logPath, JSON.stringify(entry) + '\n');
 }
 
@@ -728,7 +729,7 @@ async function scanLinkedInCompanies(options) {
     // Output
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
     const outputTopic = topic || 'LinkedIn';
-    const dir = path.join(outputTopic, 'LinkedIn');
+    const dir = path.join(DATA_DIR, outputTopic, 'LinkedIn');
     fs.mkdirSync(dir, { recursive: true });
 
     const jsonFile = path.join(dir, `companies-${timestamp}.json`);

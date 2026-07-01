@@ -41,6 +41,7 @@ import { execSync, spawnSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const DATA_DIR = path.join(__dirname, '..', 'data');
 
 // Load .env if available
 try {
@@ -278,7 +279,7 @@ function extractUniqueUsers(leads, tierFilter) {
 // ── Profile saving / loading ────────────────────────────────────────────────
 
 function saveUserProfile(username, profileData, topic) {
-    const dir = path.join(topic, 'Profiles');
+    const dir = path.join(DATA_DIR, topic, 'Profiles');
     fs.mkdirSync(dir, { recursive: true });
 
     const filePath = path.join(dir, `${username}.json`);
@@ -296,11 +297,11 @@ function saveUserProfile(username, profileData, topic) {
 }
 
 function profileExists(username, topic) {
-    return fs.existsSync(path.join(topic, 'Profiles', `${username}.json`));
+    return fs.existsSync(path.join(DATA_DIR, topic, 'Profiles', `${username}.json`));
 }
 
 function loadCachedProfile(username, topic) {
-    const filePath = path.join(topic, 'Profiles', `${username}.json`);
+    const filePath = path.join(DATA_DIR, topic, 'Profiles', `${username}.json`);
     if (!fs.existsSync(filePath)) return null;
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
@@ -801,14 +802,14 @@ function checkSherlockInstalled() {
 }
 
 function runSherlock(username, topic) {
-    const cacheFile = path.join(topic, 'Profiles', `sherlock-${username}.csv`);
+    const cacheFile = path.join(DATA_DIR, topic, 'Profiles', `sherlock-${username}.csv`);
 
     // Return cached result if available
     if (fs.existsSync(cacheFile)) {
         return fs.readFileSync(cacheFile, 'utf8');
     }
 
-    const outputDir = path.join(topic, 'Profiles');
+    const outputDir = path.join(DATA_DIR, topic, 'Profiles');
     fs.mkdirSync(outputDir, { recursive: true });
 
     const sherlockCmd = getSherlockCmd();
@@ -1379,7 +1380,7 @@ async function enrichLeads(leadsFile, topic, tierFilter, maxUsers, maxItems, ski
 
     // 7. Generate outputs
     const today = new Date().toISOString().slice(0, 10);
-    const enrichDir = path.join(topic, 'Enriched');
+    const enrichDir = path.join(DATA_DIR, topic, 'Enriched');
     fs.mkdirSync(enrichDir, { recursive: true });
 
     if (isResearchMode || doSherlock) {
@@ -1466,7 +1467,7 @@ async function enrichLeads(leadsFile, topic, tierFilter, maxUsers, maxItems, ski
 
     // Always generate pending-enrichment.txt for Claude follow-up
     const enrichmentText = formatForClaude(allProfiles, leadsData.leads, topic, leadsFile);
-    const pendingPath = path.join(topic, 'pending-enrichment.txt');
+    const pendingPath = path.join(DATA_DIR, topic, 'pending-enrichment.txt');
     fs.writeFileSync(pendingPath, enrichmentText);
     console.log(`Saved pending enrichment → ${pendingPath}`);
 
@@ -1483,7 +1484,7 @@ async function enrichLeads(leadsFile, topic, tierFilter, maxUsers, maxItems, ski
         outputFile: (isResearchMode || doSherlock) ? path.join(enrichDir, `enriched-${today}.json`) : pendingPath,
         durationMs: Date.now() - startTime
     });
-    const logPath = path.join(__dirname, '..', 'enrichment-history.jsonl');
+    const logPath = path.join(DATA_DIR, 'enrichment-history.jsonl');
     fs.appendFileSync(logPath, logEntry + '\n');
 
     // 9. Next steps

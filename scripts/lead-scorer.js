@@ -28,6 +28,11 @@
 
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_DIR = path.join(__dirname, '..', 'data');
 
 const args = process.argv.slice(2);
 
@@ -251,7 +256,7 @@ if (allItems.length === 0) {
 
 let outputFile;
 if (topic) {
-    outputFile = path.join(topic, 'pending-leads.txt');
+    outputFile = path.join(DATA_DIR, topic, 'pending-leads.txt');
 } else {
     const slug = slugFromFile(inputFile);
     outputFile = `pending-leads-${slug}.txt`;
