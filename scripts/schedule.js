@@ -20,6 +20,7 @@ import { execSync } from 'child_process';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.join(__dirname, '..');
+const DATA_DIR = path.join(projectRoot, 'data');
 
 const CONFIG_PATH = path.join(projectRoot, 'scrape-config.json');
 const PLIST_NAME = 'com.reddit-scrape.scheduled';
@@ -223,9 +224,9 @@ function installLaunchd() {
         <integer>0</integer>
     </dict>
     <key>StandardOutPath</key>
-    <string>${path.join(projectRoot, 'schedule-output.log')}</string>
+    <string>${path.join(DATA_DIR, 'schedule-output.log')}</string>
     <key>StandardErrorPath</key>
-    <string>${path.join(projectRoot, 'schedule-error.log')}</string>
+    <string>${path.join(DATA_DIR, 'schedule-error.log')}</string>
 </dict>
 </plist>`;
 
@@ -238,7 +239,7 @@ function installLaunchd() {
         console.log('Scheduled job installed successfully.');
         console.log(`  Runs every Monday at 8:00 AM`);
         console.log(`  Plist: ${PLIST_PATH}`);
-        console.log(`  Logs: ${path.join(projectRoot, 'schedule-output.log')}`);
+        console.log(`  Logs: ${path.join(DATA_DIR, 'schedule-output.log')}`);
     } catch (err) {
         console.error(`Failed to load launchd job: ${err.message}`);
     }
@@ -266,7 +267,7 @@ function showStatus() {
     console.log(`  Plist: ${PLIST_PATH}`);
     console.log(`  Schedule: Every Monday at 8:00 AM`);
 
-    const logFile = path.join(projectRoot, 'schedule-output.log');
+    const logFile = path.join(DATA_DIR, 'schedule-output.log');
     if (fs.existsSync(logFile)) {
         const stat = fs.statSync(logFile);
         console.log(`  Last log update: ${stat.mtime.toISOString()}`);
