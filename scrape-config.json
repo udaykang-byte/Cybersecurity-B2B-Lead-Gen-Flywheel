@@ -1,0 +1,191 @@
+{
+  "jobs": [
+    {
+      "topic": "IdentityManagement",
+      "urls": [
+        "https://www.reddit.com/r/IdentityManagement/",
+        "https://www.reddit.com/r/cybersecurity/search/?q=identity+access+management",
+        "https://www.reddit.com/r/sysadmin/search/?q=identity+access+management+OR+IAM+solution",
+        "https://www.reddit.com/r/cybersecurity/search/?q=identity+governance+OR+IGA",
+        "https://www.reddit.com/r/cybersecurity/search/?q=unified+identity+OR+identity+security+platform"
+      ],
+      "sort": "new",
+      "maxPosts": 15,
+      "maxComments": 10,
+      "since": "30d",
+      "minAge": 7
+    },
+    {
+      "topic": "PAM",
+      "urls": [
+        "https://www.reddit.com/r/cybersecurity/search/?q=privileged+access+management",
+        "https://www.reddit.com/r/cybersecurity/search/?q=PAM+solution+OR+PAM+tool+OR+PAM+software",
+        "https://www.reddit.com/r/cybersecurity/search/?q=CyberArk+OR+BeyondTrust+OR+Delinea+privileged",
+        "https://www.reddit.com/r/sysadmin/search/?q=privileged+access+management",
+        "https://www.reddit.com/r/sysadmin/search/?q=password+vaulting+OR+credential+vault",
+        "https://www.reddit.com/r/sysadmin/search/?q=service+account+management+OR+orphaned+accounts",
+        "https://www.reddit.com/r/netsec/search/?q=privileged+access+OR+just-in-time+access",
+        "https://www.reddit.com/r/netsec/search/?q=zero+standing+privileges+OR+least+privilege"
+      ],
+      "sort": "new",
+      "maxPosts": 20,
+      "maxComments": 10,
+      "since": "30d",
+      "minAge": 7
+    },
+    {
+      "topic": "DevSecOps",
+      "urls": [
+        "https://www.reddit.com/r/devops/search/?q=secrets+management+OR+credential+rotation",
+        "https://www.reddit.com/r/devops/search/?q=hashicorp+vault+OR+service+account",
+        "https://www.reddit.com/r/kubernetes/search/?q=secrets+management+OR+vault+secrets",
+        "https://www.reddit.com/r/aws/search/?q=IAM+OR+secrets+manager+OR+privileged+access"
+      ],
+      "sort": "new",
+      "maxPosts": 15,
+      "maxComments": 8,
+      "since": "30d",
+      "minAge": 7
+    },
+    {
+      "topic": "GRC",
+      "urls": [
+        "https://www.reddit.com/r/grc/",
+        "https://www.reddit.com/r/SecurityCareerAdvice/search/?q=GRC",
+        "https://www.reddit.com/r/cybersecurity/search/?q=SOX+compliance+access+controls",
+        "https://www.reddit.com/r/cybersecurity/search/?q=PCI+DSS+privileged+access",
+        "https://www.reddit.com/r/cybersecurity/search/?q=HIPAA+access+management",
+        "https://www.reddit.com/r/netsec/search/?q=audit+trail+OR+access+certification"
+      ],
+      "sort": "new",
+      "maxPosts": 15,
+      "maxComments": 10,
+      "since": "30d",
+      "minAge": 7
+    },
+    {
+      "topic": "Governance",
+      "urls": [
+        "https://www.reddit.com/r/grc/",
+        "https://www.reddit.com/r/cybersecurity/search/?q=security+governance"
+      ],
+      "sort": "new",
+      "maxPosts": 10,
+      "maxComments": 10,
+      "since": "30d",
+      "minAge": 7
+    }
+  ],
+  "linkedinScans": [
+    {
+      "script": "linkedin-jobs",
+      "topic": "IdentityManagement",
+      "category": "iam",
+      "maxResults": 25
+    },
+    {
+      "script": "linkedin-jobs",
+      "topic": "GRC",
+      "category": "grc",
+      "maxResults": 25
+    },
+    {
+      "script": "linkedin-people",
+      "topic": "IdentityManagement",
+      "category": "ciso",
+      "since": "90d"
+    }
+  ],
+  "accountSignalsRun": {
+    "csvFile": "target-accounts.csv",
+    "enrich": true,
+    "maxCompanies": 20,
+    "_note": "Runs account-signals.js with Discogen enrichment after all scrapes. Remove or set enrich:false to skip Discogen API calls."
+  },
+  "linkedinFeedScans": [
+    {
+      "script": "linkedin-feed",
+      "topic": "PAM",
+      "maxResults": 25,
+      "since": "7d",
+      "note": "Core PAM feature/product keywords"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "PAMThreats",
+      "maxResults": 25,
+      "since": "7d",
+      "note": "Threat/use-case pain keywords"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "PAMCompliance",
+      "maxResults": 20,
+      "since": "7d",
+      "note": "Compliance-driven PAM buyers"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "PAMCloud",
+      "maxResults": 20,
+      "since": "7d",
+      "note": "Cloud/infra-specific PAM keywords"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "PAMEvaluation",
+      "maxResults": 25,
+      "since": "7d",
+      "note": "Bottom-of-funnel, active evaluation"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "IdentityManagement",
+      "maxResults": 20,
+      "since": "7d",
+      "note": "IGA/identity governance pain keywords"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "GRC",
+      "maxResults": 20,
+      "since": "7d",
+      "note": "Compliance access control keywords"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "CompetitorCyberArk",
+      "maxResults": 25,
+      "since": "14d",
+      "note": "CyberArk customer complaints, migrations, renewals — generates battle card"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "CompetitorBeyondTrust",
+      "maxResults": 20,
+      "since": "14d",
+      "note": "BeyondTrust customer chatter — generates battle card"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "CompetitorDelinea",
+      "maxResults": 20,
+      "since": "14d",
+      "note": "Delinea/Thycotic customer chatter — generates battle card"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "CompetitorSailPoint",
+      "maxResults": 20,
+      "since": "14d",
+      "note": "SailPoint customer chatter — generates battle card"
+    },
+    {
+      "script": "linkedin-feed",
+      "topic": "CompetitorAll",
+      "maxResults": 25,
+      "since": "14d",
+      "note": "Cross-competitor migration + churn signals — generates consolidated battle card"
+    }
+  ]
+}

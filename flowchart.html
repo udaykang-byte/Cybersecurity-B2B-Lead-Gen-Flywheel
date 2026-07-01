@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reddit Lead Finder — Project Flowchart</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e1e4ed;
+    --muted: #8b8fa3;
+    --hot: #ff4d6a;
+    --warm: #f59e0b;
+    --cold: #3b82f6;
+    --green: #10b981;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+    --line: #3a3d4a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    text-align: center;
+    padding: 48px 24px 32px;
+    background: linear-gradient(180deg, #1a1d2a 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  .header p {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .flow-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative;
+  }
+
+  /* Vertical spine */
+  .spine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--line);
+    transform: translateX(-50%);
+    z-index: 0;
+  }
+
+  .step {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 24px;
+  }
+
+  .step-connector {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+  }
+
+  .arrow-down {
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid var(--line);
+  }
+
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .step-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .step-title-group { flex: 1; }
+
+  .step-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .step-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .step-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .step-body {
+    padding: 20px 24px;
+    display: none;
+  }
+
+  .step-body.open { display: block; }
+
+  .step-toggle {
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .step-toggle.open { transform: rotate(180deg); }
+
+  /* Flow inside step */
+  .inner-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .flow-box {
+    flex: 1;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .flow-box h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    opacity: 0.6;
+  }
+
+  .flow-box code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    background: rgba(255,255,255,0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .flow-box ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .flow-box li {
+    padding: 3px 0;
+    position: relative;
+    padding-left: 16px;
+  }
+
+  .flow-box li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+
+  .inner-arrow {
+    display: flex;
+    justify-content: center;
+    padding: 4px 0;
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  /* Color themes */
+  .theme-blue .step-number { background: rgba(59,130,246,0.15); color: var(--cold); }
+  .theme-blue .step-card { border-color: rgba(59,130,246,0.2); }
+  .theme-blue .step-badge { background: rgba(59,130,246,0.1); color: var(--cold); }
+  .theme-blue .flow-box li::before { background: var(--cold); }
+
+  .theme-green .step-number { background: rgba(16,185,129,0.15); color: var(--green); }
+  .theme-green .step-card { border-color: rgba(16,185,129,0.2); }
+  .theme-green .step-badge { background: rgba(16,185,129,0.1); color: var(--green); }
+  .theme-green .flow-box li::before { background: var(--green); }
+
+  .theme-purple .step-number { background: rgba(167,139,250,0.15); color: var(--purple); }
+  .theme-purple .step-card { border-color: rgba(167,139,250,0.2); }
+  .theme-purple .step-badge { background: rgba(167,139,250,0.1); color: var(--purple); }
+  .theme-purple .flow-box li::before { background: var(--purple); }
+
+  .theme-warm .step-number { background: rgba(245,158,11,0.15); color: var(--warm); }
+  .theme-warm .step-card { border-color: rgba(245,158,11,0.2); }
+  .theme-warm .step-badge { background: rgba(245,158,11,0.1); color: var(--warm); }
+  .theme-warm .flow-box li::before { background: var(--warm); }
+
+  .theme-hot .step-number { background: rgba(255,77,106,0.15); color: var(--hot); }
+  .theme-hot .step-card { border-color: rgba(255,77,106,0.2); }
+  .theme-hot .step-badge { background: rgba(255,77,106,0.1); color: var(--hot); }
+  .theme-hot .flow-box li::before { background: var(--hot); }
+
+  .theme-cyan .step-number { background: rgba(34,211,238,0.15); color: var(--cyan); }
+  .theme-cyan .step-card { border-color: rgba(34,211,238,0.2); }
+  .theme-cyan .step-badge { background: rgba(34,211,238,0.1); color: var(--cyan); }
+  .theme-cyan .flow-box li::before { background: var(--cyan); }
+
+  /* Bonus section */
+  .bonus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .bonus-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .bonus-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bonus-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .bonus-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .section-label {
+    text-align: center;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin: 40px 0 16px;
+  }
+
+  /* Data path diagram */
+  .data-path {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 0;
+    flex-wrap: wrap;
+  }
+
+  .data-node {
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .data-arrow {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* Cost bar */
+  .cost-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .cost-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(16,185,129,0.1);
+    color: var(--green);
+    font-family: 'SF Mono', monospace;
+  }
+
+  /* Topics */
+  .topics-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+    justify-content: center;
+  }
+
+  .topic-chip {
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .flow-row { flex-direction: column; }
+    .header h1 { font-size: 22px; }
+    .bonus-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Reddit Lead Finder</h1>
+  <p>Automated B2B lead generation pipeline that discovers cybersecurity professionals on Reddit, scores them with AI, and enriches prospects with contact information.</p>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--cold)"></div> Scrape</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Filter</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> AI Score</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--warm)"></div> Review</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--hot)"></div> Enrich</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div> Notify</div>
+  </div>
+  <div class="topics-row">
+    <span class="topic-chip">IAM</span>
+    <span class="topic-chip">GRC</span>
+    <span class="topic-chip">PAM</span>
+    <span class="topic-chip">Governance</span>
+    <span class="topic-chip">Compliance</span>
+  </div>
+</div>
+
+<div class="flow-container">
+  <div class="spine"></div>
+
+  <!-- STEP 1 -->
+  <div class="step theme-blue">
+    <div class="step-card">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-number">1</div>
+        <div class="step-title-group">
+          <div class="step-title">Scrape Reddit</div>
+          <div class="step-subtitle">reddit-scraper.js &rarr; Apify API</div>
+        </div>
+        <div class="step-badge">Automated</div>
+        <div class="step-toggle">&#9660;</div>
+      </div>
+      <div class="step-body">
+        <div class="inner-flow">
+          <div class="flow-row">
+            <div class="flow-box">
+              <h4>Input</h4>
+              <ul>
+                <li>Reddit URLs (subreddits + search queries)</li>
+                <li>Topic name, sort order, date filter</li>
+                <li>Config: <code>scrape-config.json</code></li>
+              </ul>
+            </div>
+            <div class="flow-box">
+              <h4>Process</h4>
+              <ul>
+                <li>Call Apify <code>trudax~reddit-scraper-lite</code></li>
+                <li>Poll until scrape completes (1-5 min)</li>
+                <li>Deduplicate against <code>.seen-urls.json</code></li>
+                <li>Filter by date if <code>--since</code> specified</li>
+              </ul>
+            </div>
+            <div class="flow-box">
+              <h4>Output</h4>
+              <ul>
+                <li><code>{topic}/Scrapes/scrape-{ts}.json</code></li>
+                <li>Posts: title, author, body, score, URL</li>
+                <li>Comments: author, body, subreddit, URL</li>
+                <li>Logged to <code>scrape-history.jsonl</code></li>
+              </ul>
+            </div>
+          </div>
+          <div class="cost-bar">
+            <span style="font-size:12px;color:var(--muted)">Cost:</span>
+            <span class="cost-tag">~$0.003-0.005 / result</span>
+            <span style="font-size:12px;color:var(--muted)">Features: parallel URLs, cross-run dedup, date filtering</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-connector"><div class="arrow-down"></div></div>
+
+  <!-- STEP 2 -->
+  <div class="step theme-green">
+    <div class="step-card">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-number">2</div>
+        <div class="step-title-group">
+          <div class="step-title">Filter & Pre-process</div>
+          <div class="step-subtitle">lead-scorer.js &rarr; Local processing</div>
+        </div>
+        <div class="step-badge">Automated</div>
+        <div class="step-toggle">&#9660;</div>
+      </div>
+      <div class="step-body">
+        <div class="inner-flow">
+          <div class="flow-row">
+            <div class="flow-box">
+              <h4>Filters Applied</h4>
+              <ul>
+                <li>Remove bots (automoderator, [deleted])</li>
+                <li>Remove career seekers (2+ phrase matches)</li>
+                <li>Remove deleted/removed posts</li>
+                <li>Require min 30 chars text length</li>
+              </ul>
+            </div>
+            <div class="flow-box">
+              <h4>Smart Override</h4>
+              <ul>
+                <li>Buyer signal detection keeps high-intent posts</li>
+                <li>Budget mentions, tool evaluations, vendor comparisons</li>
+                <li>Overrides career-seeker filter if buying intent found</li>
+              </ul>
+            </div>
+            <div class="flow-box">
+              <h4>Output</h4>
+              <ul>
+                <li><code>{topic}/pending-leads.txt</code></li>
+                <li>Formatted: [index] TYPE | AUTHOR | SUB | BODY</li>
+                <li>Pre-filter summary report</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-connector"><div class="arrow-down"></div></div>
+
+  <!-- STEP 3 -->
+  <div class="step theme-purple">
+    <div class="step-card">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-number">3</div>
+        <div class="step-title-group">
+          <div class="step-title">AI Lead Scoring</div>
+          <div class="step-subtitle">Claude AI &rarr; Manual step</div>
+        </div>
+        <div class="step-badge">Manual + AI</div>
+        <div class="step-toggle">&#9660;</div>
+      </div>
+      <div class="step-body">
+        <div class="inner-flow">
+          <div class="flow-row">
+            <div class="flow-box">
+              <h4>Scoring Criteria</h4>
+              <ul>
+                <li><span style="color:var(--hot);font-weight:600">HOT (8-10):</span> Decision-maker, actively buying, company identified</li>
+                <li><span style="color:var(--warm);font-weight:600">WARM (5-7):</span> Practitioner with pain points, not actively buying</li>
+                <li><span style="color:var(--cold);font-weight:600">COLD (1-4):</span> Mentioned topic but unlikely buyer</li>
+              </ul>
+            </div>
+            <div class="flow-box">
+              <h4>AI Generates</h4>
+              <ul>
+                <li>Score 1-10 per lead</li>
+                <li>Tier assignment (HOT / WARM / COLD)</li>
+                <li>Reasoning for the score</li>
+                <li>Personalized outreach message draft</li>
+              </ul>
+            </div>
+          </div>
+          <div class="data-path">
+            <div class="data-node">pending-leads.txt</div>
+            <div class="data-arrow">&rarr;</div>
+            <div class="data-node" style="border-color:var(--purple)">Claude AI</div>
+            <div class="data-arrow">&rarr;</div>
+            <div class="data-node">leads-{date}.json</div>
+            <div class="data-arrow">+</div>
+            <div class="data-node">leads-{date}.md</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-connector"><div class="arrow-down"></div></div>
+
+  <!-- STEP 4 -->
+  <div class="step theme-warm">
+    <div class="step-card">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-number">4</div>
+        <div class="step-title-group">
+          <div class="step-title">Human Review & Prioritize</div>
+          <div class="step-subtitle">Review leads-{date}.md report</div>
+        </div>
+        <div class="step-badge">Manual</div>
+        <div class="step-toggle">&#9660;</div>
+      </div>
+      <div class="step-body">
+        <div class="inner-flow">
+          <div class="flow-row">
+            <div class="flow-box">
+              <h4>Review Process</h4>
+              <ul>
+                <li>Read the markdown report with scored leads</li>
+                <li>Identify highest-value HOT leads</li>
+                <li>Validate AI scoring against your judgement</li>
+                <li>Plan outreach strategy and timing</li>
+              </ul>
+            </div>
+            <div class="flow-box">
+              <h4>Decision Point</h4>
+              <ul>
+                <li>Which leads to enrich further?</li>
+                <li>Select tiers to proceed: <code>--tiers HOT,WARM</code></li>
+                <li>Cap enrichment: <code>--max-users N</code></li>
+                <li>Choose research depth (with/without Perplexity)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-connector"><div class="arrow-down"></div></div>
+
+  <!-- STEP 5 -->
+  <div class="step theme-hot">
+    <div class="step-card">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-number">5</div>
+        <div class="step-title-group">
+          <div class="step-title">Enrich & Research Prospects</div>
+          <div class="step-subtitle">enrich-leads.js &rarr; Apify + Perplexity API</div>
+        </div>
+        <div class="step-badge">Automated</div>
+        <div class="step-toggle">&#9660;</div>
+      </div>
+      <div class="step-body">
+        <div class="inner-flow">
+          <div class="flow-row">
+            <div class="flow-box">
+              <h4>Step A: Profile Scraping</h4>
+              <ul>
+                <li>Extract usernames from leads JSON</li>
+                <li>Scrape full Reddit history via Apify</li>
+                <li>Cache in <code>Profiles/{user}.json</code></li>
+                <li>Up to 100 posts/comments per user</li>
+              </ul>
+            </div>
+            <div class="flow-box">
+              <h4>Step B: Signal Extraction</h4>
+              <ul>
+                <li>Company hints ("at my org", "we use")</li>
+                <li>Role hints ("I manage", "as an engineer")</li>
+                <li>Location hints (cities, regions)</li>
+                <li>Tech stack (Okta, Entra, CyberArk...)</li>
+              </ul>
+            </div>
+            <div class="flow-box">
+              <h4>Step C: Perplexity Research</h4>
+              <ul>
+                <li>Query Perplexity Sonar API with signals</li>
+                <li>Find LinkedIn profile URL</li>
+                <li>Identify real name & employer</li>
+                <li>Extract email if available</li>
+              </ul>
+            </div>
+          </div>
+          <div class="inner-arrow">&darr;</div>
+          <div class="flow-row">
+            <div class="flow-box" style="border-color:var(--hot)">
+              <h4>Final Output</h4>
+              <ul>
+                <li><code>Enriched/enriched-{date}.json</code> + <code>.md</code></li>
+                <li>Revised scores (vendor accounts downgraded)</li>
+                <li>Company, role, location, tech stack</li>
+                <li>LinkedIn URL, email, enhanced outreach message</li>
+              </ul>
+            </div>
+          </div>
+          <div class="cost-bar">
+            <span style="font-size:12px;color:var(--muted)">Cost:</span>
+            <span class="cost-tag">~$0.30 Apify/user</span>
+            <span class="cost-tag">~$0.05 Perplexity/user</span>
+            <span style="font-size:12px;color:var(--muted)">3 modes: scrape-only, full research, research-only (cached)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-connector"><div class="arrow-down"></div></div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="step theme-cyan">
+    <div class="step-card">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-number">&#9889;</div>
+        <div class="step-title-group">
+          <div class="step-title">Notifications & Alerts</div>
+          <div class="step-subtitle">notify.js &rarr; macOS + Slack</div>
+        </div>
+        <div class="step-badge">Optional</div>
+        <div class="step-toggle">&#9660;</div>
+      </div>
+      <div class="step-body">
+        <div class="inner-flow">
+          <div class="flow-row">
+            <div class="flow-box">
+              <h4>Triggers</h4>
+              <ul>
+                <li>Runs after Step 3 scoring</li>
+                <li>Filters for HOT leads (score 8+)</li>
+              </ul>
+            </div>
+            <div class="flow-box">
+              <h4>Channels</h4>
+              <ul>
+                <li>macOS native notification</li>
+                <li>Slack webhook message (if configured)</li>
+                <li>Rich formatting with score, excerpt, URL</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BONUS TOOLS -->
+  <div class="section-label">Bonus Tools</div>
+  <div class="bonus-grid">
+    <div class="bonus-card">
+      <h3>
+        <div class="bonus-icon" style="background:rgba(59,130,246,0.1);color:var(--cold)">&#128197;</div>
+        Scheduler
+      </h3>
+      <p><code>schedule.js</code> &mdash; Runs all scrape jobs weekly via macOS launchd. Install with <code>--install</code>, runs every Monday at 8 AM. Auto-generates leads across all topics.</p>
+    </div>
+    <div class="bonus-card">
+      <h3>
+        <div class="bonus-icon" style="background:rgba(16,185,129,0.1);color:var(--green)">&#128200;</div>
+        Trend Analysis
+      </h3>
+      <p><code>trends.js</code> &mdash; Analyzes volume over time, extracts top keywords, identifies rising topics, and finds recurring authors across all scrape history.</p>
+    </div>
+    <div class="bonus-card">
+      <h3>
+        <div class="bonus-icon" style="background:rgba(167,139,250,0.1);color:var(--purple)">&#128269;</div>
+        Subreddit Discovery
+      </h3>
+      <p><code>discover-subreddits.js</code> &mdash; Scans existing scrape data for mentioned subreddits and cross-posting patterns to recommend new communities to monitor.</p>
+    </div>
+  </div>
+
+  <!-- DATA MAP -->
+  <div class="section-label">File Structure Per Topic</div>
+  <div class="step">
+    <div class="step-card" style="border-color:var(--border)">
+      <div style="padding:24px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;line-height:2;color:var(--muted)">
+        <span style="color:var(--text);font-weight:600">{Topic}/</span><br>
+        &nbsp;&nbsp;<span style="color:var(--cold)">Scrapes/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;scrape-{timestamp}.json &nbsp;<span style="opacity:0.5">&larr; Step 1 output</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;.seen-urls.json &nbsp;<span style="opacity:0.5">&larr; Dedup tracking</span><br>
+        &nbsp;&nbsp;<span style="color:var(--green)">pending-leads.txt</span> &nbsp;<span style="opacity:0.5">&larr; Step 2 output</span><br>
+        &nbsp;&nbsp;<span style="color:var(--purple)">Leads/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;leads-{date}.json &nbsp;<span style="opacity:0.5">&larr; Step 3 output (structured)</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;leads-{date}.md &nbsp;<span style="opacity:0.5">&larr; Step 3 output (readable)</span><br>
+        &nbsp;&nbsp;<span style="color:var(--hot)">Profiles/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;{username}.json &nbsp;<span style="opacity:0.5">&larr; Step 5A output</span><br>
+        &nbsp;&nbsp;<span style="color:var(--hot)">Enriched/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;enriched-{date}.json &nbsp;<span style="opacity:0.5">&larr; Step 5C output (structured)</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;enriched-{date}.md &nbsp;<span style="opacity:0.5">&larr; Step 5C output (readable)</span><br>
+        &nbsp;&nbsp;<span style="color:var(--cyan)">pending-enrichment.txt</span> &nbsp;<span style="opacity:0.5">&larr; For manual Claude enrichment</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- COST SUMMARY -->
+  <div class="section-label">Monthly Cost Estimate</div>
+  <div class="step">
+    <div class="step-card" style="border-color:var(--border)">
+      <div style="padding:24px;display:flex;justify-content:space-around;flex-wrap:wrap;gap:16px;text-align:center">
+        <div>
+          <div style="font-size:28px;font-weight:700;color:var(--green)">~$4.34</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Total / month</div>
+        </div>
+        <div>
+          <div style="font-size:18px;font-weight:600;color:var(--cold)">~$0.84</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Scraping (4 topics x 4 runs)</div>
+        </div>
+        <div>
+          <div style="font-size:18px;font-weight:600;color:var(--hot)">~$3.50</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Enrichment (10 HOT leads)</div>
+        </div>
+        <div>
+          <div style="font-size:18px;font-weight:600;color:var(--green)">Free</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Notifications</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(header) {
+    const body = header.nextElementSibling;
+    const arrow = header.querySelector('.step-toggle');
+    body.classList.toggle('open');
+    arrow.classList.toggle('open');
+  }
+
+  // Open all by default
+  document.querySelectorAll('.step-body').forEach(b => b.classList.add('open'));
+  document.querySelectorAll('.step-toggle').forEach(a => a.classList.add('open'));
+</script>
+
+</body>
+</html>
