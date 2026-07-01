@@ -66,9 +66,11 @@ Discogen enriches target companies with breach news, funding rounds, CISO change
    DISCOGEN_API_KEY=your_discogen_key_here
    ```
 
-### 5. (Optional) Set up Perplexity for deep prospect research
+### 5. (Optional) Set up research engines for deep prospect research
 
-If you want the enrichment script to automatically research prospects (find LinkedIn profiles, real names, company info), add a Perplexity API key:
+`enrich-leads.js` supports two research engines — Perplexity and Exa. Use one or both:
+
+**Perplexity (`--research` flag):**
 
 1. Go to [docs.perplexity.ai](https://docs.perplexity.ai/) and sign up
 2. Go to API Settings → create an API key
@@ -79,6 +81,17 @@ PERPLEXITY_API_KEY=pplx-xxxxxxxxxxxxxxxxxxxx
 ```
 
 > **Cost:** ~$0.005 per query. A typical enrichment run with 10 users costs ~$0.10 for the Perplexity portion.
+
+**Exa (`--exa` flag):**
+
+1. Go to [exa.ai](https://exa.ai/) and sign up
+2. Add it to `.env`:
+
+```
+EXA_API_KEY=your_exa_api_key_here
+```
+
+Also used by `account-signals.js` as a secondary lookup source. Optional Sherlock username-discovery is available if the `sherlock` CLI is installed locally.
 
 ### 6. (Optional) Set up Slack notifications
 
@@ -172,7 +185,7 @@ node scripts/reddit-scraper.js \
 **What to expect:** You'll see a progress counter as it scrapes. When done, it shows a summary like:
 
 ```
-Results saved to: GRC/Scrapes/scrape-2026-03-11T14-30.json
+Results saved to: data/GRC/Scrapes/scrape-2026-03-11T14-30.json
 
 === SUMMARY ===
 Total items (deduplicated): 51
@@ -180,7 +193,7 @@ Posts: 6
 Comments: 45
 ```
 
-**Where results go:** Inside the topic folder → `Scrapes/` subfolder.
+**Where results go:** `data/<Topic>/Scrapes/` subfolder.
 
 > **Tip:** If you're scraping multiple URLs and want it to go faster, add `--parallel 3` to scrape 3 URLs at the same time.
 
@@ -195,7 +208,7 @@ Comments: 45
 **Copy-paste this command** (replace the file path with your actual scrape file):
 
 ```bash
-node scripts/lead-scorer.js GRC/Scrapes/scrape-2026-03-11T14-30.json --topic GRC
+node scripts/lead-scorer.js data/GRC/Scrapes/scrape-2026-03-11T14-30.json --topic GRC
 ```
 
 > **How to find the file path:** After Step 1, the tool prints "Results saved to: ..." — use that path.
@@ -212,10 +225,10 @@ Pre-filter results:
     Career seekers:     3
   Remaining for Claude to score: 42
 
-Formatted 42 items → GRC/pending-leads.txt
+Formatted 42 items → data/GRC/pending-leads.txt
 ```
 
-**Where results go:** Creates a `pending-leads.txt` file in your topic folder. This is what Claude will read next.
+**Where results go:** Creates `data/<Topic>/pending-leads.txt`. This is what Claude will read next.
 
 > **Optional:** Add `--since 7d` to also remove posts older than 7 days.
 
@@ -228,7 +241,7 @@ Formatted 42 items → GRC/pending-leads.txt
 **Open Claude and paste this exact prompt:**
 
 ```
-Score the leads in GRC/pending-leads.txt
+Score the leads in data/GRC/pending-leads.txt
 
 For each item, score it 1-10 as a B2B lead for our cybersecurity services
 (IAM, GRC, PAM, and security governance).
@@ -248,8 +261,8 @@ For each lead include:
 - a suggested outreach message (personalized to their specific pain point)
 
 Save the results as:
-- GRC/Leads/leads-2026-03-11.json (structured data)
-- GRC/Leads/leads-2026-03-11.md (readable report)
+- data/GRC/Leads/leads-2026-03-11.json (structured data)
+- data/GRC/Leads/leads-2026-03-11.md (readable report)
 ```
 
 > **Change the topic/date as needed.** Replace `GRC` with your topic name, and use today's date.
@@ -266,7 +279,7 @@ Save the results as:
 After Claude scores leads and saves the JSON file, push the results to Supabase:
 
 ```bash
-node scripts/supabase-sync.js GRC/Leads/leads-2026-04-02.json
+node scripts/supabase-sync.js data/GRC/Leads/leads-2026-04-02.json
 ```
 
 This updates `lead_score`, `lead_tier`, `excerpt`, `reasoning`, and `suggested_outreach` for each lead in Supabase. Leads already in the database are updated; new ones are inserted.
@@ -339,7 +352,7 @@ There are two modes:
 Scrapes Reddit profiles and creates a file for Claude to analyze manually:
 
 ```bash
-node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT
+node scripts/enrich-leads.js data/IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT
 ```
 
 This creates `pending-enrichment.txt`. Then ask Claude to analyze it (see prompt below).
@@ -349,7 +362,7 @@ This creates `pending-enrichment.txt`. Then ask Claude to analyze it (see prompt
 Scrapes Reddit profiles **and** automatically researches each prospect using Perplexity Sonar AI — finds LinkedIn profiles, real names, company info, and emails:
 
 ```bash
-node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT --research
+node scripts/enrich-leads.js data/IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT --research
 ```
 
 > **Requires:** `PERPLEXITY_API_KEY` in your `.env` file (see Setup step 3).
@@ -359,7 +372,7 @@ node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --to
 If you already scraped profiles and just want to run the Perplexity research step:
 
 ```bash
-node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT --research-only
+node scripts/enrich-leads.js data/IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT --research-only
 ```
 
 This skips Apify (no scraping cost) and uses the profile data already saved in `Profiles/`.
@@ -375,6 +388,7 @@ This skips Apify (no scraping cost) and uses the profile data already saved in `
 | `--skip-scraped` | Skip users already in Profiles/ folder | |
 | `--research` | Enable Perplexity deep research after scraping | |
 | `--research-only` | Skip scraping, run Perplexity research on cached profiles | |
+| `--exa` | Use Exa.ai instead of Perplexity for deep research | |
 
 **What to expect with `--research`:**
 
@@ -384,7 +398,7 @@ Estimated cost: ~$0.60 (100 items/user at $0.003/result)
 
 [1/2] Scraping u/foxhelp (HOT)...
 [1/2]   Fetched 100 items
-[1/2]   Saved to IdentityManagement/Profiles/foxhelp.json
+[1/2]   Saved to data/IdentityManagement/Profiles/foxhelp.json
 
 --- Perplexity Deep Research ---
 [1/2] Extracting signals for u/foxhelp...
@@ -395,8 +409,8 @@ Estimated cost: ~$0.60 (100 items/user at $0.003/result)
 [1/2]   Company: confirmed
 
 Enriched reports saved:
-  IdentityManagement/Enriched/enriched-2026-03-17.json
-  IdentityManagement/Enriched/enriched-2026-03-17.md
+  data/IdentityManagement/Enriched/enriched-2026-03-17.json
+  data/IdentityManagement/Enriched/enriched-2026-03-17.md
 ```
 
 **How the automated research works:**
@@ -409,7 +423,7 @@ Enriched reports saved:
 **If not using `--research`, ask Claude manually:**
 
 ```
-Enrich the leads in IdentityManagement/pending-enrichment.txt
+Enrich the leads in data/IdentityManagement/pending-enrichment.txt
 
 For each user, analyze their Reddit history and extract:
 - Company/employer, job title, industry, location
@@ -417,11 +431,11 @@ For each user, analyze their Reddit history and extract:
 - Then web search for their LinkedIn profile and email
 
 Save results as:
-- IdentityManagement/Enriched/enriched-2026-03-14.json
-- IdentityManagement/Enriched/enriched-2026-03-14.md
+- data/IdentityManagement/Enriched/enriched-2026-03-14.json
+- data/IdentityManagement/Enriched/enriched-2026-03-14.md
 ```
 
-**Where results go:** Inside the topic folder → `Profiles/` (raw data) and `Enriched/` (final reports).
+**Where results go:** `data/<Topic>/Profiles/` (raw data) and `data/<Topic>/Enriched/` (final reports).
 
 > **Tip:** Use `--max-users 2 --tiers HOT` for a cheap first test run (~$0.60 for Apify + ~$0.02 for Perplexity).
 
@@ -442,10 +456,12 @@ There are **3 separate tools**, each targeting a different LinkedIn signal sourc
 Searches LinkedIn job postings for cybersecurity hiring signals. Extracts competitor tools, compliance frameworks, and pain language from job descriptions.
 
 ```bash
-node scripts/linkedin-jobs.js --topic IdentityManagement --category iam
+node scripts/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=IAM+Engineer&f_TPR=r604800" --topic IdentityManagement
 ```
 
-**Categories (from the playbook):**
+> **Note:** `linkedin-jobs.js` accepts one or more LinkedIn Jobs search URLs as positional arguments, then applies scoring locally. Use LinkedIn's job search to build the URL (filter by keyword, location, recency), then pass it here.
+
+**Signal categories extracted from each posting:**
 
 | Category | What It Searches For |
 |----------|---------------------|
@@ -465,7 +481,7 @@ node scripts/linkedin-jobs.js --topic IdentityManagement --category iam
 
 > **Tip:** Use `--dry-run` first to see what queries will run without spending Apify credits.
 
-> **Tip:** Use `--category iam --max-results 5` for a cheap first test (~$1-2).
+> **Tip:** Use `--count 5 --dry-run` first to preview what will be scraped before spending credits.
 
 ### Tool 2: LinkedIn People Scanner (`linkedin-people.js`)
 
@@ -518,7 +534,7 @@ The script auto-detects the LinkedIn URL column and merges your CSV metadata wit
 | Option | Script(s) | What it does |
 |--------|-----------|-------------|
 | `--topic <Name>` | All 3 | Topic directory for output |
-| `--category <cat>` | jobs, people | Filter search queries |
+| `--category <cat>` | people only | Filter role type (ciso, director, manager, all) |
 | `--max-results <N>` | jobs, people | Max results per query (default: 25) |
 | `--max-companies <N>` | companies | Cap companies to scrape |
 | `--since <duration>` | jobs, people | Recency filter (e.g., 7d, 30d, 90d) |
@@ -539,7 +555,7 @@ Each signal is scored out of 50 based on the Intent Signals Playbook:
 | Hiring Security/GRC role | 25 | +3 if compliance framework cited | Medium |
 | LinkedIn post about access pain | 22 | +5 if person identified | Medium |
 
-**Where results go:** `<Topic>/LinkedIn/` folder with JSON + markdown reports.
+**Where results go:** `data/<Topic>/LinkedIn/` folder with JSON + markdown reports.
 
 ---
 
@@ -548,7 +564,7 @@ Each signal is scored out of 50 based on the Intent Signals Playbook:
 After Claude scores the leads, run:
 
 ```bash
-node scripts/notify.js GRC/Leads/leads-2026-03-11.json
+node scripts/notify.js data/GRC/Leads/leads-2026-03-11.json
 ```
 
 This will:
@@ -695,40 +711,41 @@ https://www.reddit.com/search/?q=YOUR+SEARCH+TERMS
 
 ```
 Your Project Folder/
-├── GRC/
-│   ├── Scrapes/              ← Raw data from Reddit (Step 1)
-│   │   └── scrape-2026-03-11T14-30.json
-│   ├── Leads/                ← Scored leads (Step 3)
-│   │   ├── leads-2026-03-11.json
-│   │   └── leads-2026-03-11.md    ← Open this to review leads
-│   ├── Profiles/             ← Reddit user profile data (Step 5)
-│   │   └── Constant-Angle-4777.json
-│   ├── Enriched/             ← Contact info & outreach data (Step 5)
-│   │   ├── enriched-2026-03-11.json
-│   │   └── enriched-2026-03-11.md  ← Open this for outreach info
-│   ├── pending-leads.txt     ← Formatted data for Claude (Step 2)
-│   └── pending-enrichment.txt ← Profile data for Claude (Step 5)
-│
-├── IdentityManagement/       ← Same structure for each topic
-│   ├── Scrapes/
-│   ├── Leads/
-│   ├── Profiles/
-│   ├── Enriched/
-│   └── LinkedIn/             ← LinkedIn signal scan results (Step 6)
-│       ├── jobs-2026-03-19T14-30.json
-│       ├── jobs-2026-03-19T14-30.md
-│       ├── people-2026-03-19T15-00.json
-│       ├── people-2026-03-19T15-00.md
-│       ├── companies-2026-03-19T15-30.json
-│       ├── companies-2026-03-19T15-30.md
-│       └── .seen-urls.json   ← Local dedup fallback (replaced by Supabase when configured)
-│
-├── PAM/
-├── DevSecOps/
-├── Governance/
-├── scrape-history.jsonl      ← Log of all Reddit scrape runs
-├── linkedin-history.jsonl    ← Log of all LinkedIn scan runs
-└── enrichment-history.jsonl  ← Log of all enrichment runs
+├── data/                     ← ALL generated output lives here
+│   ├── GRC/
+│   │   ├── Scrapes/              ← Raw data from Reddit (Step 1)
+│   │   │   └── scrape-2026-03-11T14-30.json
+│   │   ├── Leads/                ← Scored leads (Step 3)
+│   │   │   ├── leads-2026-03-11.json
+│   │   │   └── leads-2026-03-11.md    ← Open this to review leads
+│   │   ├── Profiles/             ← Reddit user profile data (Step 5)
+│   │   │   └── Constant-Angle-4777.json
+│   │   ├── Enriched/             ← Contact info & outreach data (Step 5)
+│   │   │   ├── enriched-2026-03-11.json
+│   │   │   └── enriched-2026-03-11.md  ← Open this for outreach info
+│   │   ├── pending-leads.txt     ← Formatted data for Claude (Step 2)
+│   │   └── pending-enrichment.txt ← Profile data for Claude (Step 5)
+│   │
+│   ├── IdentityManagement/       ← Same structure for each topic
+│   │   ├── Scrapes/
+│   │   ├── Leads/
+│   │   ├── Profiles/
+│   │   ├── Enriched/
+│   │   └── LinkedIn/             ← LinkedIn signal scan results (Step 6)
+│   │       ├── jobs-2026-03-19T14-30.json
+│   │       ├── jobs-2026-03-19T14-30.md
+│   │       ├── people-2026-03-19T15-00.json
+│   │       ├── people-2026-03-19T15-00.md
+│   │       ├── companies-2026-03-19T15-30.json
+│   │       ├── companies-2026-03-19T15-30.md
+│   │       └── .seen-urls.json   ← Local dedup fallback (replaced by Supabase when configured)
+│   │
+│   ├── PAM/
+│   ├── DevSecOps/
+│   ├── Governance/
+│   ├── scrape-history.jsonl      ← Log of all Reddit scrape runs
+│   ├── linkedin-history.jsonl    ← Log of all LinkedIn scan runs
+│   └── enrichment-history.jsonl  ← Log of all enrichment runs
 ```
 
 ---
@@ -756,17 +773,17 @@ Your Project Folder/
 | What You Want To Do | Command |
 |---------------------|---------|
 | Scrape GRC subreddits | `node scripts/reddit-scraper.js "https://www.reddit.com/r/grc/" --topic GRC --since 7d` |
-| Filter a scrape file for scoring | `node scripts/lead-scorer.js GRC/Scrapes/scrape-XXXX.json --topic GRC` |
-| Check for HOT leads | `node scripts/notify.js GRC/Leads/leads-XXXX.json` |
-| Enrich leads for outreach | `node scripts/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC` |
-| Enrich only HOT leads | `node scripts/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC --tiers HOT` |
-| Enrich with auto-research | `node scripts/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC --tiers HOT --research` |
-| Re-research cached profiles | `node scripts/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC --research-only` |
-| **LinkedIn: Scan job postings** | `node scripts/linkedin-jobs.js --topic IdentityManagement --category iam` |
+| Filter a scrape file for scoring | `node scripts/lead-scorer.js data/GRC/Scrapes/scrape-XXXX.json --topic GRC` |
+| Check for HOT leads | `node scripts/notify.js data/GRC/Leads/leads-XXXX.json` |
+| Enrich leads for outreach | `node scripts/enrich-leads.js data/GRC/Leads/leads-XXXX.json --topic GRC` |
+| Enrich only HOT leads | `node scripts/enrich-leads.js data/GRC/Leads/leads-XXXX.json --topic GRC --tiers HOT` |
+| Enrich with auto-research | `node scripts/enrich-leads.js data/GRC/Leads/leads-XXXX.json --topic GRC --tiers HOT --research` |
+| Re-research cached profiles | `node scripts/enrich-leads.js data/GRC/Leads/leads-XXXX.json --topic GRC --research-only` |
+| **LinkedIn: Scan job postings** | `node scripts/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=IAM+Engineer" --topic IdentityManagement` |
 | **LinkedIn: Find new CISOs** | `node scripts/linkedin-people.js --topic IdentityManagement --category ciso` |
 | **LinkedIn: Enrich companies** | `node scripts/linkedin-companies.js accounts.csv --topic IdentityManagement` |
-| LinkedIn: Dry run (no cost) | `node scripts/linkedin-jobs.js --category iam --dry-run` |
-| **Sync scored leads to Supabase** | `node scripts/supabase-sync.js GRC/Leads/leads-XXXX.json` |
+| LinkedIn: Dry run (no cost) | `node scripts/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=IAM+Engineer" --dry-run` |
+| **Sync scored leads to Supabase** | `node scripts/supabase-sync.js data/GRC/Leads/leads-XXXX.json` |
 | **Notify HOT leads from Supabase** | `node scripts/notify.js` |
 | Run all topics at once | `node scripts/schedule.js` |
 | Auto-scrape every Monday | `node scripts/schedule.js --install` |
