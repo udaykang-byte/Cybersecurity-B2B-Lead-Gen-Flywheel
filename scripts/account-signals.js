@@ -47,6 +47,7 @@ import db from './lib/supabase.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const DATA_DIR = path.join(__dirname, '..', 'data');
 
 // ── Load .env ──
 try {
@@ -187,7 +188,7 @@ let hhsBreachCache = null;
 async function loadHHSBreachData() {
     if (hhsBreachCache !== null) return hhsBreachCache;
 
-    const cacheFile = path.join(__dirname, '..', '.hhs-breach-cache.json');
+    const cacheFile = path.join(DATA_DIR, '.hhs-breach-cache.json');
 
     // Use cached file if < 24 hours old
     if (fs.existsSync(cacheFile)) {
@@ -394,7 +395,7 @@ function parseAccountsCSV(filePath) {
 // ── Local Data Cross-Reference ──
 function findLocalJobSignals(companyName, companyUrl) {
     const results = { signals: [], tools: [], frameworks: [], painLanguage: [], postCount: 0 };
-    const rootDir = path.join(__dirname, '..');
+    const rootDir = DATA_DIR;
     const nameLower = companyName.toLowerCase();
     const urlSlug = (companyUrl.match(/\/company\/([^/]+)/)?.[1] || '').toLowerCase();
 
@@ -443,7 +444,7 @@ function findLocalJobSignals(companyName, companyUrl) {
 
 function findLocalFeedSignals(companyName) {
     const results = { hotPosts: 0, warmPosts: 0, toolsMentioned: [], painKeywords: [] };
-    const rootDir = path.join(__dirname, '..');
+    const rootDir = DATA_DIR;
     const nameLower = companyName.toLowerCase();
     if (!nameLower) return results;
 
@@ -1066,7 +1067,7 @@ async function run(options) {
 
     // Save output
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
-    const outDir = path.join(__dirname, '..', `AccountSignals/${timestamp}`);
+    const outDir = path.join(DATA_DIR, 'AccountSignals', timestamp);
     fs.mkdirSync(outDir, { recursive: true });
 
     const meta = {
