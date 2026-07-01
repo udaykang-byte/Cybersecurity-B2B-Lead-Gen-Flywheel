@@ -1,0 +1,53 @@
+# ── Secrets ──
+.env
+.env.local
+.env.*.local
+
+# ── All generated data (consolidated under data/ after Task 7) ──
+/data/
+
+# ── Legacy generated locations (pre-consolidation safety net) ──
+# Keeps us safe even before Task 7 moves everything into data/.
+*/Scrapes/
+*/Leads/
+*/Enriched/
+*/Profiles/
+*/LinkedIn/
+*/Qualified/
+AccountSignals/
+*.jsonl
+.seen-urls.json
+.seen-feed-urls.json
+**/.seen-urls.json
+**/.seen-feed-urls.json
+.hhs-breach-cache.json
+pending-*.txt
+schedule-output.log
+schedule-error.log
+
+# ── Loose data / research / target lists (never publish) ──
+scrape-*.json
+!scrape-config.json
+pending-leads-*.txt
+*-accounts.csv
+tmp-*.csv
+cybersecurity-research.md
+
+# ── Proprietary docs — excluded from public repo (relocated in Task 12) ──
+Intent SIgnals Playbook/
+docs/playbook/
+*.docx
+
+# ── Claude internal (ship only the skill wrappers) ──
+.claude/*
+!.claude/skills/
+
+# ── Dev-process scratch (plans, SDD ledger — keep local, not product) ──
+.superpowers/
+docs/superpowers/
+
+# ── OS / editor junk ──
+.DS_Store
+**/.DS_Store
+~$*
+node_modules/
