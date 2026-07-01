@@ -220,6 +220,27 @@ These parameters define "good fit" for this business (B2B cybersecurity / IAM / 
 
 **Level 1 competitor disqualification — add to vendor check:** Wallix, Senhasegura, Arcon, StrongDM, HashiCorp, Omada Identity (in addition to standard IAM/cybersecurity vendors)
 
-## Reference
+## Reference: Qualification Framework
 
-Full qualification methodology: `Account Qualification/SKILL.md` (FITS framework, Level 1-3 details, re-qualification rules, batch workflow)
+### The Qualification Stack
+
+Account qualification happens at three levels. Match the depth to the deal value.
+
+| Level | Depth | Cost | Output |
+|-------|-------|------|--------|
+| **Level 1** | Automated screening (firmographic + technographic filters) | Seconds/account | Pass or Fail — binary |
+| **Level 2** | Enriched FITS scoring (intent, hiring, funding signals) | Minutes/account | Score 0-100 + Tier assignment |
+| **Level 3** | Deep qualification (manual research, contact mapping) | 30-60 min/account | Full account brief; Tier 1 targets only |
+
+Level 1 runs for every lead. Level 2 for those that pass (typically 40-60%). Level 3 for Tier 1 + high-value Tier 2 only (top 5-15%).
+
+### Re-Qualification: When to Stop Pursuing
+
+| Scenario | Action | When to Re-engage |
+|----------|--------|-------------------|
+| No reply after full sequence (4 steps) | Pause. Move to nurture. | Re-engage only with a NEW signal |
+| Replied "not interested" | Remove from active campaigns | Never re-engage on same angle. Wait 6+ months with new signal only |
+| Replied "not now" | Add to time-based nurture | Re-engage in 30-60 days with new value |
+| Replied "talk to someone else" (referral) | Contact the referral immediately | This is a win, not a rejection |
+| Bounced email | Find alternate contact or remove | Only re-engage if you find a valid contact |
+| Company went through major change (layoffs, merger) | Re-score the account | May upgrade or disqualify based on change |
