@@ -62,4 +62,4 @@ See **[GUIDE.md](./GUIDE.md)** for every script, flag, and the full step-by-step
 
 ## License
 
-Proprietary — see [LICENSE](./LICENSE). Published publicly for demonstration purposes only; no license to use is granted.
+MIT — see [LICENSE](./LICENSE). Free to clone, use, modify, and adapt for your own lead-gen workflows.
