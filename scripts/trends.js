@@ -9,9 +9,9 @@
  *   - Recurring authors (relationship-building targets)
  *
  * Usage:
- *   node Skills/trends.js <Topic>
- *   node Skills/trends.js GRC
- *   node Skills/trends.js IdentityManagement
+ *   node scripts/trends.js <Topic>
+ *   node scripts/trends.js GRC
+ *   node scripts/trends.js IdentityManagement
  */
 
 import fs from 'fs';
@@ -85,11 +85,11 @@ function run() {
 Trend Analysis — analyze scrapes over time
 
 Usage:
-  node Skills/trends.js <Topic>
+  node scripts/trends.js <Topic>
 
 Examples:
-  node Skills/trends.js GRC
-  node Skills/trends.js IdentityManagement
+  node scripts/trends.js GRC
+  node scripts/trends.js IdentityManagement
         `);
         process.exit(0);
     }

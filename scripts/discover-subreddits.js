@@ -8,9 +8,9 @@
  * are cross-referenced in discussions.
  *
  * Usage:
- *   node Skills/discover-subreddits.js <Topic> [--keywords "term1,term2"]
- *   node Skills/discover-subreddits.js GRC
- *   node Skills/discover-subreddits.js IdentityManagement --keywords "SSO,SAML,Okta"
+ *   node scripts/discover-subreddits.js <Topic> [--keywords "term1,term2"]
+ *   node scripts/discover-subreddits.js GRC
+ *   node scripts/discover-subreddits.js IdentityManagement --keywords "SSO,SAML,Okta"
  */
 
 import fs from 'fs';
@@ -83,11 +83,11 @@ function run() {
 Subreddit Discovery — find new relevant communities
 
 Usage:
-  node Skills/discover-subreddits.js <Topic> [--keywords "term1,term2"]
+  node scripts/discover-subreddits.js <Topic> [--keywords "term1,term2"]
 
 Examples:
-  node Skills/discover-subreddits.js GRC
-  node Skills/discover-subreddits.js IdentityManagement --keywords "SSO,SAML,Okta"
+  node scripts/discover-subreddits.js GRC
+  node scripts/discover-subreddits.js IdentityManagement --keywords "SSO,SAML,Okta"
 
 Analyzes your existing scrapes to find subreddits mentioned in discussions.
         `);
@@ -97,7 +97,7 @@ Analyzes your existing scrapes to find subreddits mentioned in discussions.
     const scrapesDir = path.join(topic, 'Scrapes');
     if (!fs.existsSync(scrapesDir)) {
         console.error(`No scrapes directory found: ${scrapesDir}`);
-        console.error(`Run some scrapes first: node Skills/reddit-scraper.js <url> --topic ${topic}`);
+        console.error(`Run some scrapes first: node scripts/reddit-scraper.js <url> --topic ${topic}`);
         process.exit(1);
     }
 

@@ -4,12 +4,12 @@
  * Reddit Scraper using Apify
  *
  * Usage:
- *   node Skills/reddit-scraper.js <url1> [url2] [--topic <Name>] [--sort top|new|relevance] [--max-comments N] [--max-posts N] [--since <duration>] [--parallel N]
+ *   node scripts/reddit-scraper.js <url1> [url2] [--topic <Name>] [--sort top|new|relevance] [--max-comments N] [--max-posts N] [--since <duration>] [--parallel N]
  *
  * Examples:
- *   node Skills/reddit-scraper.js "https://www.reddit.com/r/IdentityManagement/" --topic IdentityManagement
+ *   node scripts/reddit-scraper.js "https://www.reddit.com/r/IdentityManagement/" --topic IdentityManagement
  *
- *   node Skills/reddit-scraper.js \
+ *   node scripts/reddit-scraper.js \
  *     "https://www.reddit.com/r/grc/" \
  *     "https://www.reddit.com/r/cybersecurity/search/?q=GRC&sort=top&t=year" \
  *     --topic GRC --sort top --max-posts 15
@@ -492,11 +492,11 @@ async function scrapeReddit(urls, maxComments = 10, maxPosts = 10, sort = 'new',
         console.log(`\n${'─'.repeat(50)}`);
         if (postsOnly) {
             console.log(`Next step — score posts, then fetch comments for relevant ones:`);
-            console.log(`  1. node Skills/lead-scorer.js "${outputFile}" --topic ${topic}`);
-            console.log(`  2. node Skills/reddit-scraper.js --fetch-comments <leads.json> --topic ${topic}`);
+            console.log(`  1. node scripts/lead-scorer.js "${outputFile}" --topic ${topic}`);
+            console.log(`  2. node scripts/reddit-scraper.js --fetch-comments <leads.json> --topic ${topic}`);
         } else {
             console.log(`Next step — score leads:`);
-            console.log(`  node Skills/lead-scorer.js "${outputFile}" --topic ${topic}`);
+            console.log(`  node scripts/lead-scorer.js "${outputFile}" --topic ${topic}`);
         }
         console.log(`${'─'.repeat(50)}\n`);
     }
@@ -653,7 +653,7 @@ async function fetchCommentsForLeads(leadsFile, topic, tiers, maxComments = 50) 
     if (topic) {
         console.log(`\n${'─'.repeat(50)}`);
         console.log(`Next step — re-score with comments included:`);
-        console.log(`  node Skills/lead-scorer.js "${outputFile}" --topic ${topic}`);
+        console.log(`  node scripts/lead-scorer.js "${outputFile}" --topic ${topic}`);
         console.log(`${'─'.repeat(50)}\n`);
     }
 
@@ -683,7 +683,7 @@ if (rawArgs.length === 0) {
 Reddit Scraper using Apify
 
 Usage:
-  node Skills/reddit-scraper.js <url1> [url2] [--topic <Name>] [--sort top|new|relevance]
+  node scripts/reddit-scraper.js <url1> [url2] [--topic <Name>] [--sort top|new|relevance]
     [--max-comments N] [--max-posts N] [--since <duration>] [--parallel N]
     [--posts-only] [--min-age N] [--fetch-comments <leads.json>]
 
@@ -706,28 +706,28 @@ Options:
 
 Two-phase workflow (recommended):
   Phase 1 — posts only, min 7 days old:
-    node Skills/reddit-scraper.js "https://www.reddit.com/r/IdentityManagement/" \\
+    node scripts/reddit-scraper.js "https://www.reddit.com/r/IdentityManagement/" \\
       --topic IdentityManagement --posts-only --min-age 7
 
   Score:
-    node Skills/lead-scorer.js IdentityManagement/Scrapes/posts-<timestamp>.json \\
+    node scripts/lead-scorer.js IdentityManagement/Scrapes/posts-<timestamp>.json \\
       --topic IdentityManagement
 
   Phase 2 — fetch comments for HOT/WARM posts only:
-    node Skills/reddit-scraper.js \\
+    node scripts/reddit-scraper.js \\
       --fetch-comments IdentityManagement/Leads/leads-<date>.json \\
       --topic IdentityManagement
 
   Enrich:
-    node Skills/enrich-leads.js IdentityManagement/Leads/leads-<date>.json \\
+    node scripts/enrich-leads.js IdentityManagement/Leads/leads-<date>.json \\
       --topic IdentityManagement --exa --sherlock
 
 Examples:
   Single URL with topic (standard):
-    node Skills/reddit-scraper.js "https://www.reddit.com/r/IdentityManagement/" --topic IdentityManagement
+    node scripts/reddit-scraper.js "https://www.reddit.com/r/IdentityManagement/" --topic IdentityManagement
 
   Multi-URL, parallel, recent only:
-    node Skills/reddit-scraper.js \\
+    node scripts/reddit-scraper.js \\
       "https://www.reddit.com/r/grc/" \\
       "https://www.reddit.com/r/cybersecurity/search/?q=GRC&sort=top&t=year" \\
       --topic GRC --max-posts 15 --since 30d --parallel 3

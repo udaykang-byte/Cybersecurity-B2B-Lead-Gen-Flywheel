@@ -36,7 +36,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ── Load .env (two levels up from Skills/lib/) ──
+// ── Load .env (two levels up from scripts/lib/) ──
 try {
     const envPath = path.join(__dirname, '..', '..', '.env');
     if (fs.existsSync(envPath)) {

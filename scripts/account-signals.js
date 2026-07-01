@@ -14,7 +14,7 @@
  *   - With metadata: company_name,linkedin_url,...
  *
  * Usage:
- *   node Skills/account-signals.js <csv-file> [options]
+ *   node scripts/account-signals.js <csv-file> [options]
  *
  * Options:
  *   --min-score <N>         Only include accounts scoring >= N (default: 15)
@@ -24,9 +24,9 @@
  *   --dry-run               Show plan without making API calls
  *
  * Examples:
- *   node Skills/account-signals.js target-accounts.csv
- *   node Skills/account-signals.js accounts.csv --min-score 28 --no-enrich
- *   node Skills/account-signals.js urls.csv --dry-run
+ *   node scripts/account-signals.js target-accounts.csv
+ *   node scripts/account-signals.js accounts.csv --min-score 28 --no-enrich
+ *   node scripts/account-signals.js urls.csv --dry-run
  *
  * Environment:
  *   Requires APIFY_API_TOKEN and EXA_API_KEY in .env
@@ -1196,7 +1196,7 @@ HHS OCR breach data, and existing local job/feed scans. Scores each account
 using the Intent Signals Playbook model and ranks by urgency tier.
 
 Usage:
-  node Skills/account-signals.js <csv-file> [options]
+  node scripts/account-signals.js <csv-file> [options]
 
 CSV Format:
   URL-only (no header):
@@ -1220,9 +1220,9 @@ Scoring tiers:
   LOW      (15-21): Monitor list
 
 Examples:
-  node Skills/account-signals.js target-accounts.csv
-  node Skills/account-signals.js accounts.csv --min-score 28
-  node Skills/account-signals.js urls.csv --no-enrich --dry-run
+  node scripts/account-signals.js target-accounts.csv
+  node scripts/account-signals.js accounts.csv --min-score 28
+  node scripts/account-signals.js urls.csv --no-enrich --dry-run
     `);
     process.exit(0);
 }
@@ -1246,7 +1246,7 @@ for (let i = 0; i < rawArgs.length; i++) {
 
 if (!csvFile) {
     console.error('Error: CSV file path is required as the first argument.');
-    console.error('  Usage: node Skills/account-signals.js <csv-file>');
+    console.error('  Usage: node scripts/account-signals.js <csv-file>');
     process.exit(1);
 }
 

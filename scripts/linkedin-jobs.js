@@ -8,7 +8,7 @@
  * descriptions, then scores and prioritizes leads using the Intent Signals Playbook.
  *
  * Usage:
- *   node Skills/linkedin-jobs.js <url1> [url2] [options]
+ *   node scripts/linkedin-jobs.js <url1> [url2] [options]
  *
  * Options:
  *   --topic <Name>          Topic directory for output (default: "LinkedIn")
@@ -18,8 +18,8 @@
  *   --dry-run               Print URLs and actor info without calling Apify
  *
  * Examples:
- *   node Skills/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=IAM&geoId=103644278&f_TPR=r86400" --topic IdentityManagement
- *   node Skills/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=CISO" --count 50 --dry-run
+ *   node scripts/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=IAM&geoId=103644278&f_TPR=r86400" --topic IdentityManagement
+ *   node scripts/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=CISO" --count 50 --dry-run
  *
  * Environment:
  *   Requires APIFY_API_TOKEN in .env
@@ -812,7 +812,7 @@ async function scanLinkedInJobs(options) {
 
     if (searchUrls.length === 0) {
         console.error('Error: provide at least one LinkedIn search URL.');
-        console.error('  Usage: node Skills/linkedin-jobs.js <url1> [url2] [options]');
+        console.error('  Usage: node scripts/linkedin-jobs.js <url1> [url2] [options]');
         process.exit(1);
     }
 
@@ -1056,7 +1056,7 @@ using the Intent Signals Playbook.
 Uses Apify actor: ${ACTOR_ID}
 
 Usage:
-  node Skills/linkedin-jobs.js <url1> [url2] [options]
+  node scripts/linkedin-jobs.js <url1> [url2] [options]
 
 Options:
   --topic <Name>          Topic directory for output (default: "LinkedIn")
@@ -1066,8 +1066,8 @@ Options:
   --dry-run               Print URLs and actor info without calling Apify
 
 Examples:
-  node Skills/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=IAM&geoId=103644278&f_TPR=r86400" --topic IdentityManagement
-  node Skills/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=CISO" --count 50 --dry-run
+  node scripts/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=IAM&geoId=103644278&f_TPR=r86400" --topic IdentityManagement
+  node scripts/linkedin-jobs.js "https://www.linkedin.com/jobs/search/?keywords=CISO" --count 50 --dry-run
     `);
     process.exit(0);
 }
@@ -1098,7 +1098,7 @@ for (let i = 0; i < rawArgs.length; i++) {
 
 if (cliUrls.length === 0) {
     console.error('Error: provide at least one LinkedIn search URL.');
-    console.error('  Usage: node Skills/linkedin-jobs.js <url1> [url2] [options]');
+    console.error('  Usage: node scripts/linkedin-jobs.js <url1> [url2] [options]');
     console.error('  Run with --help for full usage.');
     process.exit(1);
 }

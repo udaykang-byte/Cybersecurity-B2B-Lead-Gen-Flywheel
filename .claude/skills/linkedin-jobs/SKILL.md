@@ -9,12 +9,12 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/linkedin-jobs.js $ARGUMENTS
+node scripts/linkedin-jobs.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage and ask for LinkedIn search URLs:
 ```
-Usage: node Skills/linkedin-jobs.js <url1> [url2] [options]
+Usage: node scripts/linkedin-jobs.js <url1> [url2] [options]
 
 Options:
   --topic <Name>          Topic directory for output (default: "LinkedIn")

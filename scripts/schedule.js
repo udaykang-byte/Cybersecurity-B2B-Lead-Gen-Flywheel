@@ -4,10 +4,10 @@
  * Scheduled Scraper — runs all Reddit + LinkedIn jobs defined in scrape-config.json
  *
  * Usage:
- *   node Skills/schedule.js                  Run all jobs now
- *   node Skills/schedule.js --install        Install weekly macOS launchd job
- *   node Skills/schedule.js --uninstall      Remove the launchd job
- *   node Skills/schedule.js --status         Show if the launchd job is installed
+ *   node scripts/schedule.js                  Run all jobs now
+ *   node scripts/schedule.js --install        Install weekly macOS launchd job
+ *   node scripts/schedule.js --uninstall      Remove the launchd job
+ *   node scripts/schedule.js --status         Show if the launchd job is installed
  *
  * Config: scrape-config.json in project root
  */
@@ -259,7 +259,7 @@ function uninstallLaunchd() {
 function showStatus() {
     if (!fs.existsSync(PLIST_PATH)) {
         console.log('Status: NOT INSTALLED');
-        console.log(`Run: node Skills/schedule.js --install`);
+        console.log(`Run: node scripts/schedule.js --install`);
         return;
     }
     console.log('Status: INSTALLED');

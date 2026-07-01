@@ -8,12 +8,12 @@
  * optionally uses Perplexity Sonar API for deep prospect research.
  *
  * Usage:
- *   node Skills/enrich-leads.js <leads-json-file> --topic <Name> [options]
+ *   node scripts/enrich-leads.js <leads-json-file> --topic <Name> [options]
  *
  * Examples:
- *   node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement
- *   node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --research
- *   node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --research-only --tiers HOT
+ *   node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement
+ *   node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --research
+ *   node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --research-only --tiers HOT
  *
  * Options:
  *   --topic <Name>        Topic directory (required)
@@ -1498,9 +1498,9 @@ async function enrichLeads(leadsFile, topic, tierFilter, maxUsers, maxItems, ski
         console.log(`  "Enrich the leads in ${pendingPath}"`);
         console.log('');
         console.log('Or re-run with --exa for automated Exa.ai research:');
-        console.log(`  node Skills/enrich-leads.js ${leadsFile} --topic ${topic} --exa-only`);
+        console.log(`  node scripts/enrich-leads.js ${leadsFile} --topic ${topic} --exa-only`);
         console.log('Or re-run with --research for automated Perplexity research:');
-        console.log(`  node Skills/enrich-leads.js ${leadsFile} --topic ${topic} --research-only`);
+        console.log(`  node scripts/enrich-leads.js ${leadsFile} --topic ${topic} --research-only`);
     }
     console.log(`${'─'.repeat(50)}\n`);
 }
@@ -1514,7 +1514,7 @@ if (rawArgs.length === 0) {
 Reddit Lead Enrichment — Profile Scraper + Deep Research
 
 Usage:
-  node Skills/enrich-leads.js <leads-json-file> --topic <Name> [options]
+  node scripts/enrich-leads.js <leads-json-file> --topic <Name> [options]
 
 Options:
   --topic <Name>        Topic directory (required)
@@ -1533,22 +1533,22 @@ Options:
 
 Examples:
   Maximum enrichment (Sherlock → GitHub → Exa → LinkedIn):
-    node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --exa-only --sherlock --tiers HOT
+    node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --exa-only --sherlock --tiers HOT
 
   Sherlock only (no Exa API cost):
-    node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --sherlock --tiers HOT
+    node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --sherlock --tiers HOT
 
   Full automated pipeline with Exa.ai research:
-    node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --exa
+    node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --exa
 
   Exa research only (profiles already cached):
-    node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --exa-only --tiers HOT
+    node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --exa-only --tiers HOT
 
   Full automated pipeline with Perplexity research:
-    node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --research
+    node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --research
 
   Perplexity research only (profiles already cached):
-    node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --research-only --tiers HOT
+    node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --research-only --tiers HOT
     `);
     process.exit(0);
 }

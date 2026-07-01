@@ -115,7 +115,7 @@ LinkedIn:  Step 6: Scan LinkedIn (Jobs / People / Companies / Feed)
 
 #### GRC
 ```bash
-node Skills/reddit-scraper.js \
+node scripts/reddit-scraper.js \
   "https://www.reddit.com/r/grc/" \
   "https://www.reddit.com/r/cybersecurity/search/?q=GRC&sort=top&t=year" \
   --topic GRC --max-posts 15 --since 30d
@@ -123,7 +123,7 @@ node Skills/reddit-scraper.js \
 
 #### IAM (Identity & Access Management)
 ```bash
-node Skills/reddit-scraper.js \
+node scripts/reddit-scraper.js \
   "https://www.reddit.com/r/IdentityManagement/" \
   "https://www.reddit.com/r/cybersecurity/search/?q=identity+access+management" \
   --topic IdentityManagement --max-posts 15 --since 30d
@@ -131,7 +131,7 @@ node Skills/reddit-scraper.js \
 
 #### PAM (Privileged Access Management)
 ```bash
-node Skills/reddit-scraper.js \
+node scripts/reddit-scraper.js \
   "https://www.reddit.com/r/cybersecurity/search/?q=privileged+access+management" \
   "https://www.reddit.com/r/cybersecurity/search/?q=CyberArk+OR+BeyondTrust+OR+Delinea+privileged" \
   "https://www.reddit.com/r/sysadmin/search/?q=privileged+access+management" \
@@ -142,7 +142,7 @@ node Skills/reddit-scraper.js \
 
 #### DevSecOps (Secrets Management / Cloud PAM)
 ```bash
-node Skills/reddit-scraper.js \
+node scripts/reddit-scraper.js \
   "https://www.reddit.com/r/devops/search/?q=secrets+management+OR+credential+rotation" \
   "https://www.reddit.com/r/devops/search/?q=hashicorp+vault+OR+service+account" \
   "https://www.reddit.com/r/kubernetes/search/?q=secrets+management+OR+vault+secrets" \
@@ -152,7 +152,7 @@ node Skills/reddit-scraper.js \
 
 #### Governance
 ```bash
-node Skills/reddit-scraper.js \
+node scripts/reddit-scraper.js \
   "https://www.reddit.com/r/grc/" \
   "https://www.reddit.com/r/cybersecurity/search/?q=security+governance" \
   --topic Governance --max-posts 10 --since 30d
@@ -195,7 +195,7 @@ Comments: 45
 **Copy-paste this command** (replace the file path with your actual scrape file):
 
 ```bash
-node Skills/lead-scorer.js GRC/Scrapes/scrape-2026-03-11T14-30.json --topic GRC
+node scripts/lead-scorer.js GRC/Scrapes/scrape-2026-03-11T14-30.json --topic GRC
 ```
 
 > **How to find the file path:** After Step 1, the tool prints "Results saved to: ..." — use that path.
@@ -266,7 +266,7 @@ Save the results as:
 After Claude scores leads and saves the JSON file, push the results to Supabase:
 
 ```bash
-node Skills/supabase-sync.js GRC/Leads/leads-2026-04-02.json
+node scripts/supabase-sync.js GRC/Leads/leads-2026-04-02.json
 ```
 
 This updates `lead_score`, `lead_tier`, `excerpt`, `reasoning`, and `suggested_outreach` for each lead in Supabase. Leads already in the database are updated; new ones are inserted.
@@ -339,7 +339,7 @@ There are two modes:
 Scrapes Reddit profiles and creates a file for Claude to analyze manually:
 
 ```bash
-node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT
+node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT
 ```
 
 This creates `pending-enrichment.txt`. Then ask Claude to analyze it (see prompt below).
@@ -349,7 +349,7 @@ This creates `pending-enrichment.txt`. Then ask Claude to analyze it (see prompt
 Scrapes Reddit profiles **and** automatically researches each prospect using Perplexity Sonar AI — finds LinkedIn profiles, real names, company info, and emails:
 
 ```bash
-node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT --research
+node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT --research
 ```
 
 > **Requires:** `PERPLEXITY_API_KEY` in your `.env` file (see Setup step 3).
@@ -359,7 +359,7 @@ node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --top
 If you already scraped profiles and just want to run the Perplexity research step:
 
 ```bash
-node Skills/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT --research-only
+node scripts/enrich-leads.js IdentityManagement/Leads/leads-2026-03-14.json --topic IdentityManagement --tiers HOT --research-only
 ```
 
 This skips Apify (no scraping cost) and uses the profile data already saved in `Profiles/`.
@@ -442,7 +442,7 @@ There are **3 separate tools**, each targeting a different LinkedIn signal sourc
 Searches LinkedIn job postings for cybersecurity hiring signals. Extracts competitor tools, compliance frameworks, and pain language from job descriptions.
 
 ```bash
-node Skills/linkedin-jobs.js --topic IdentityManagement --category iam
+node scripts/linkedin-jobs.js --topic IdentityManagement --category iam
 ```
 
 **Categories (from the playbook):**
@@ -472,7 +472,7 @@ node Skills/linkedin-jobs.js --topic IdentityManagement --category iam
 Finds new CISO/IT Director/Security Manager hires. The playbook identifies a **90-day vendor selection window** after a new security leader is hired.
 
 ```bash
-node Skills/linkedin-people.js --topic IdentityManagement --category ciso --since 90d
+node scripts/linkedin-people.js --topic IdentityManagement --category ciso --since 90d
 ```
 
 **Categories:**
@@ -489,7 +489,7 @@ node Skills/linkedin-people.js --topic IdentityManagement --category ciso --sinc
 Enriches a CSV of target company LinkedIn URLs. Scrapes company pages for employee count, growth signals, compliance certifications, and security specialties.
 
 ```bash
-node Skills/linkedin-companies.js target-accounts.csv --topic IdentityManagement
+node scripts/linkedin-companies.js target-accounts.csv --topic IdentityManagement
 ```
 
 **CSV format — two options:**
@@ -548,7 +548,7 @@ Each signal is scored out of 50 based on the Intent Signals Playbook:
 After Claude scores the leads, run:
 
 ```bash
-node Skills/notify.js GRC/Leads/leads-2026-03-11.json
+node scripts/notify.js GRC/Leads/leads-2026-03-11.json
 ```
 
 This will:
@@ -558,7 +558,7 @@ This will:
 If Supabase is configured, you can also notify for all HOT leads in the database (no file needed):
 
 ```bash
-node Skills/notify.js
+node scripts/notify.js
 ```
 
 ---
@@ -570,7 +570,7 @@ node Skills/notify.js
 Instead of scraping each topic one by one, run them all:
 
 ```bash
-node Skills/schedule.js
+node scripts/schedule.js
 ```
 
 This reads `scrape-config.json` and runs in order:
@@ -593,17 +593,17 @@ To enable the Discogen enrichment step, edit `scrape-config.json` and set `"acco
 Want it to run automatically every Monday at 8 AM?
 
 ```bash
-node Skills/schedule.js --install
+node scripts/schedule.js --install
 ```
 
 Check if it's installed:
 ```bash
-node Skills/schedule.js --status
+node scripts/schedule.js --status
 ```
 
 Remove it:
 ```bash
-node Skills/schedule.js --uninstall
+node scripts/schedule.js --uninstall
 ```
 
 ### See trends over time
@@ -611,7 +611,7 @@ node Skills/schedule.js --uninstall
 After you've done several scrapes for a topic, see what's changing:
 
 ```bash
-node Skills/trends.js GRC
+node scripts/trends.js GRC
 ```
 
 This shows you:
@@ -624,12 +624,12 @@ This shows you:
 Discover new communities based on what's mentioned in your existing scrapes:
 
 ```bash
-node Skills/discover-subreddits.js GRC
+node scripts/discover-subreddits.js GRC
 ```
 
 Add `--keywords` to filter by specific terms:
 ```bash
-node Skills/discover-subreddits.js IdentityManagement --keywords "SSO,SAML,Okta"
+node scripts/discover-subreddits.js IdentityManagement --keywords "SSO,SAML,Okta"
 ```
 
 ---
@@ -755,20 +755,20 @@ Your Project Folder/
 
 | What You Want To Do | Command |
 |---------------------|---------|
-| Scrape GRC subreddits | `node Skills/reddit-scraper.js "https://www.reddit.com/r/grc/" --topic GRC --since 7d` |
-| Filter a scrape file for scoring | `node Skills/lead-scorer.js GRC/Scrapes/scrape-XXXX.json --topic GRC` |
-| Check for HOT leads | `node Skills/notify.js GRC/Leads/leads-XXXX.json` |
-| Enrich leads for outreach | `node Skills/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC` |
-| Enrich only HOT leads | `node Skills/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC --tiers HOT` |
-| Enrich with auto-research | `node Skills/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC --tiers HOT --research` |
-| Re-research cached profiles | `node Skills/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC --research-only` |
-| **LinkedIn: Scan job postings** | `node Skills/linkedin-jobs.js --topic IdentityManagement --category iam` |
-| **LinkedIn: Find new CISOs** | `node Skills/linkedin-people.js --topic IdentityManagement --category ciso` |
-| **LinkedIn: Enrich companies** | `node Skills/linkedin-companies.js accounts.csv --topic IdentityManagement` |
-| LinkedIn: Dry run (no cost) | `node Skills/linkedin-jobs.js --category iam --dry-run` |
-| **Sync scored leads to Supabase** | `node Skills/supabase-sync.js GRC/Leads/leads-XXXX.json` |
-| **Notify HOT leads from Supabase** | `node Skills/notify.js` |
-| Run all topics at once | `node Skills/schedule.js` |
-| Auto-scrape every Monday | `node Skills/schedule.js --install` |
-| See trends for a topic | `node Skills/trends.js GRC` |
-| Find new subreddits | `node Skills/discover-subreddits.js GRC` |
+| Scrape GRC subreddits | `node scripts/reddit-scraper.js "https://www.reddit.com/r/grc/" --topic GRC --since 7d` |
+| Filter a scrape file for scoring | `node scripts/lead-scorer.js GRC/Scrapes/scrape-XXXX.json --topic GRC` |
+| Check for HOT leads | `node scripts/notify.js GRC/Leads/leads-XXXX.json` |
+| Enrich leads for outreach | `node scripts/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC` |
+| Enrich only HOT leads | `node scripts/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC --tiers HOT` |
+| Enrich with auto-research | `node scripts/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC --tiers HOT --research` |
+| Re-research cached profiles | `node scripts/enrich-leads.js GRC/Leads/leads-XXXX.json --topic GRC --research-only` |
+| **LinkedIn: Scan job postings** | `node scripts/linkedin-jobs.js --topic IdentityManagement --category iam` |
+| **LinkedIn: Find new CISOs** | `node scripts/linkedin-people.js --topic IdentityManagement --category ciso` |
+| **LinkedIn: Enrich companies** | `node scripts/linkedin-companies.js accounts.csv --topic IdentityManagement` |
+| LinkedIn: Dry run (no cost) | `node scripts/linkedin-jobs.js --category iam --dry-run` |
+| **Sync scored leads to Supabase** | `node scripts/supabase-sync.js GRC/Leads/leads-XXXX.json` |
+| **Notify HOT leads from Supabase** | `node scripts/notify.js` |
+| Run all topics at once | `node scripts/schedule.js` |
+| Auto-scrape every Monday | `node scripts/schedule.js --install` |
+| See trends for a topic | `node scripts/trends.js GRC` |
+| Find new subreddits | `node scripts/discover-subreddits.js GRC` |

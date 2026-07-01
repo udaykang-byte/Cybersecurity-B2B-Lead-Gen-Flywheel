@@ -7,7 +7,7 @@
  * each lead's score, tier, and outreach data into the reddit_leads table.
  *
  * Run after Claude scores leads:
- *   node Skills/supabase-sync.js GRC/Leads/leads-2026-04-02.json
+ *   node scripts/supabase-sync.js GRC/Leads/leads-2026-04-02.json
  *
  * What it does:
  *   - For each lead in the JSON, updates the matching reddit_leads row (matched by URL)
@@ -45,14 +45,14 @@ try {
 
 function showUsage() {
     console.log(`
-Usage: node Skills/supabase-sync.js <leads-json-file>
+Usage: node scripts/supabase-sync.js <leads-json-file>
 
 Pushes Claude-scored Reddit leads into the Supabase reddit_leads table.
 Run this after the /reddit-score skill saves a leads JSON file.
 
 Examples:
-  node Skills/supabase-sync.js GRC/Leads/leads-2026-04-02.json
-  node Skills/supabase-sync.js IdentityManagement/Leads/leads-2026-04-01.json
+  node scripts/supabase-sync.js GRC/Leads/leads-2026-04-02.json
+  node scripts/supabase-sync.js IdentityManagement/Leads/leads-2026-04-01.json
 
 What gets updated in Supabase:
   - lead_score, lead_tier, excerpt, reasoning, suggested_outreach

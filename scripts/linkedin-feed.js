@@ -8,8 +8,8 @@
  * announcing identity/security projects. Scores each post for buying intent.
  *
  * Usage:
- *   node Skills/linkedin-feed.js [keyword1] [keyword2...] [options]
- *   node Skills/linkedin-feed.js --topic IdentityManagement          (uses default keywords for topic)
+ *   node scripts/linkedin-feed.js [keyword1] [keyword2...] [options]
+ *   node scripts/linkedin-feed.js --topic IdentityManagement          (uses default keywords for topic)
  *
  * Options:
  *   --topic <Name>          Topic directory for output (default: "LinkedIn")
@@ -19,9 +19,9 @@
  *   --dry-run               Print keywords + actor info, no Apify call
  *
  * Examples:
- *   node Skills/linkedin-feed.js --topic IdentityManagement --count 25
- *   node Skills/linkedin-feed.js "evaluating PAM tools" "CyberArk alternative" --topic PAM
- *   node Skills/linkedin-feed.js --topic GRC --since 7d --score-threshold 5
+ *   node scripts/linkedin-feed.js --topic IdentityManagement --count 25
+ *   node scripts/linkedin-feed.js "evaluating PAM tools" "CyberArk alternative" --topic PAM
+ *   node scripts/linkedin-feed.js --topic GRC --since 7d --score-threshold 5
  *
  * Environment:
  *   Requires APIFY_API_TOKEN in .env
@@ -1154,7 +1154,7 @@ async function scanLinkedInFeed(options) {
         if (!keywords) {
             console.error(`Error: no keywords provided and no defaults for topic "${outputTopic}".`);
             console.error(`  Known topics: ${Object.keys(DEFAULT_KEYWORDS).join(', ')}`);
-            console.error('  Or pass keywords directly: node Skills/linkedin-feed.js "keyword1" "keyword2"');
+            console.error('  Or pass keywords directly: node scripts/linkedin-feed.js "keyword1" "keyword2"');
             process.exit(1);
         }
         console.log(`Using default keywords for topic: ${outputTopic}`);
@@ -1394,8 +1394,8 @@ announcing identity/security projects.
 Uses Apify actor: ${ACTOR_ID}
 
 Usage:
-  node Skills/linkedin-feed.js [keyword1] [keyword2...] [options]
-  node Skills/linkedin-feed.js --topic IdentityManagement    (uses topic defaults)
+  node scripts/linkedin-feed.js [keyword1] [keyword2...] [options]
+  node scripts/linkedin-feed.js --topic IdentityManagement    (uses topic defaults)
 
 Options:
   --topic <Name>          Topic directory for output (default: "LinkedIn")
@@ -1414,11 +1414,11 @@ Default keyword sets: ${Object.keys(DEFAULT_KEYWORDS).join(', ')}
   → Competitor topics auto-generate a battle-card-<ts>.md with objections + outreach playbook
 
 Examples:
-  node Skills/linkedin-feed.js --topic IdentityManagement --count 25
-  node Skills/linkedin-feed.js --topic CompetitorCyberArk --since 7d
-  node Skills/linkedin-feed.js --topic CompetitorAll --since 14d --score-threshold 5
-  node Skills/linkedin-feed.js --topic GRC --since 7d --score-threshold 5
-  node Skills/linkedin-feed.js --topic IdentityManagement --dry-run
+  node scripts/linkedin-feed.js --topic IdentityManagement --count 25
+  node scripts/linkedin-feed.js --topic CompetitorCyberArk --since 7d
+  node scripts/linkedin-feed.js --topic CompetitorAll --since 14d --score-threshold 5
+  node scripts/linkedin-feed.js --topic GRC --since 7d --score-threshold 5
+  node scripts/linkedin-feed.js --topic IdentityManagement --dry-run
     `);
     process.exit(0);
 }

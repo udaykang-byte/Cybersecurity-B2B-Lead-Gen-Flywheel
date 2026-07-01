@@ -9,12 +9,12 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/linkedin-feed.js $ARGUMENTS
+node scripts/linkedin-feed.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage and ask which topic to scan:
 ```
-Usage: node Skills/linkedin-feed.js [keyword1] [keyword2...] [options]
+Usage: node scripts/linkedin-feed.js [keyword1] [keyword2...] [options]
 
 Options:
   --topic <Name>          Topic directory for output (IdentityManagement, PAM, GRC, DevSecOps)
@@ -24,9 +24,9 @@ Options:
   --dry-run               Print keywords + actor info, no Apify call
 
 Examples:
-  node Skills/linkedin-feed.js --topic IdentityManagement --count 25
-  node Skills/linkedin-feed.js "evaluating PAM tools" "CyberArk alternative" --topic PAM
-  node Skills/linkedin-feed.js --topic GRC --since 7d
+  node scripts/linkedin-feed.js --topic IdentityManagement --count 25
+  node scripts/linkedin-feed.js "evaluating PAM tools" "CyberArk alternative" --topic PAM
+  node scripts/linkedin-feed.js --topic GRC --since 7d
 ```
 
 After the scan completes:

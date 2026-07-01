@@ -9,16 +9,16 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/discover-subreddits.js $ARGUMENTS
+node scripts/discover-subreddits.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage:
 ```
-Usage: node Skills/discover-subreddits.js <Topic> [--keywords "term1,term2"]
+Usage: node scripts/discover-subreddits.js <Topic> [--keywords "term1,term2"]
 
 Examples:
-  node Skills/discover-subreddits.js IdentityManagement
-  node Skills/discover-subreddits.js GRC --keywords "SOC2,compliance,audit"
+  node scripts/discover-subreddits.js IdentityManagement
+  node scripts/discover-subreddits.js GRC --keywords "SOC2,compliance,audit"
 ```
 
 After discovery completes:

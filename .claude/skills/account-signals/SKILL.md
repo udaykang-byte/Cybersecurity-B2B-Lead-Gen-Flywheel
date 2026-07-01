@@ -9,12 +9,12 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/account-signals.js $ARGUMENTS
+node scripts/account-signals.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage:
 ```
-Usage: node Skills/account-signals.js <csv-file> [options]
+Usage: node scripts/account-signals.js <csv-file> [options]
 
 CSV Format:
   URL-only (one per line):
@@ -38,9 +38,9 @@ Scoring tiers:
   LOW      (15-21): Monitor list
 
 Examples:
-  node Skills/account-signals.js target-accounts.csv
-  node Skills/account-signals.js accounts.csv --min-score 28
-  node Skills/account-signals.js urls.csv --no-enrich
+  node scripts/account-signals.js target-accounts.csv
+  node scripts/account-signals.js accounts.csv --min-score 28
+  node scripts/account-signals.js urls.csv --no-enrich
 ```
 
 After scoring completes:

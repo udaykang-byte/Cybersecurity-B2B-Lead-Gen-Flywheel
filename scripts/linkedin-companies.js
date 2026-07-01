@@ -15,7 +15,7 @@
  *   The script auto-detects the LinkedIn URL column.
  *
  * Usage:
- *   node Skills/linkedin-companies.js <csv-file> [options]
+ *   node scripts/linkedin-companies.js <csv-file> [options]
  *
  * Options:
  *   --topic <Name>          Topic directory for output (default: auto)
@@ -24,9 +24,9 @@
  *   --dry-run               Print companies to scrape without calling Apify
  *
  * Examples:
- *   node Skills/linkedin-companies.js target-accounts.csv --topic IdentityManagement
- *   node Skills/linkedin-companies.js accounts.csv --max-companies 10 --dry-run
- *   node Skills/linkedin-companies.js urls-only.csv --topic GRC --skip-scraped
+ *   node scripts/linkedin-companies.js target-accounts.csv --topic IdentityManagement
+ *   node scripts/linkedin-companies.js accounts.csv --max-companies 10 --dry-run
+ *   node scripts/linkedin-companies.js urls-only.csv --topic GRC --skip-scraped
  *
  * Environment:
  *   Requires APIFY_API_TOKEN in .env
@@ -795,7 +795,7 @@ Extracts employee count, growth signals, compliance certifications.
 Merges scraped data with any metadata from the CSV.
 
 Usage:
-  node Skills/linkedin-companies.js <csv-file> [options]
+  node scripts/linkedin-companies.js <csv-file> [options]
 
 CSV Format:
   URL-only (no header):
@@ -813,9 +813,9 @@ Options:
   --dry-run               Print companies to scrape without calling Apify
 
 Examples:
-  node Skills/linkedin-companies.js target-accounts.csv --topic IdentityManagement
-  node Skills/linkedin-companies.js accounts.csv --max-companies 10 --dry-run
-  node Skills/linkedin-companies.js urls-only.csv --topic GRC --skip-scraped
+  node scripts/linkedin-companies.js target-accounts.csv --topic IdentityManagement
+  node scripts/linkedin-companies.js accounts.csv --max-companies 10 --dry-run
+  node scripts/linkedin-companies.js urls-only.csv --topic GRC --skip-scraped
     `);
     process.exit(0);
 }
@@ -843,7 +843,7 @@ for (let i = 0; i < rawArgs.length; i++) {
 
 if (!inputArg) {
     console.error('Error: Input is required as the first argument (CSV file, jobs JSON, or LinkedIn company URL).');
-    console.error('  Usage: node Skills/linkedin-companies.js <csv-file|jobs.json|linkedin-url> [options]');
+    console.error('  Usage: node scripts/linkedin-companies.js <csv-file|jobs.json|linkedin-url> [options]');
     process.exit(1);
 }
 

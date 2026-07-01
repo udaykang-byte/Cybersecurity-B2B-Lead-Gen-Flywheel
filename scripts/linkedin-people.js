@@ -8,7 +8,7 @@
  * leader is hired — this script finds those hires and scores them.
  *
  * Usage:
- *   node Skills/linkedin-people.js [options]
+ *   node scripts/linkedin-people.js [options]
  *
  * Options:
  *   --topic <Name>          Topic directory for output (default: auto)
@@ -18,9 +18,9 @@
  *   --dry-run               Print queries without calling Apify
  *
  * Examples:
- *   node Skills/linkedin-people.js --topic IdentityManagement --category ciso --since 90d
- *   node Skills/linkedin-people.js --category director --max-results 10
- *   node Skills/linkedin-people.js --dry-run
+ *   node scripts/linkedin-people.js --topic IdentityManagement --category ciso --since 90d
+ *   node scripts/linkedin-people.js --category director --max-results 10
+ *   node scripts/linkedin-people.js --dry-run
  *
  * Environment:
  *   Requires APIFY_API_TOKEN in .env
@@ -743,7 +743,7 @@ Finds new CISO/IT Director/Security Manager hires on LinkedIn.
 The playbook identifies a 90-day vendor selection window after hire.
 
 Usage:
-  node Skills/linkedin-people.js [options]
+  node scripts/linkedin-people.js [options]
 
 Options:
   --topic <Name>          Topic directory for output (default: auto)
@@ -753,9 +753,9 @@ Options:
   --dry-run               Print queries without calling Apify
 
 Examples:
-  node Skills/linkedin-people.js --topic IdentityManagement --category ciso
-  node Skills/linkedin-people.js --category director --max-results 10
-  node Skills/linkedin-people.js --dry-run
+  node scripts/linkedin-people.js --topic IdentityManagement --category ciso
+  node scripts/linkedin-people.js --category director --max-results 10
+  node scripts/linkedin-people.js --dry-run
 
 Playbook role categories:
   ciso      CISO, Chief Information Security Officer, vCISO

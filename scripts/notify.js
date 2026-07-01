@@ -7,8 +7,8 @@
  * Supports macOS native notifications and optional Slack webhook.
  *
  * Usage:
- *   node Skills/notify.js <leads-json-file>
- *   node Skills/notify.js GRC/Leads/leads-2026-03-11.json
+ *   node scripts/notify.js <leads-json-file>
+ *   node scripts/notify.js GRC/Leads/leads-2026-03-11.json
  *
  * Slack setup (optional):
  *   Add SLACK_WEBHOOK_URL to your .env file
@@ -142,10 +142,10 @@ async function run() {
 HOT Lead Notifications
 
 Usage:
-  node Skills/notify.js <leads-json-file>
+  node scripts/notify.js <leads-json-file>
 
 Examples:
-  node Skills/notify.js GRC/Leads/leads-2026-03-11.json
+  node scripts/notify.js GRC/Leads/leads-2026-03-11.json
 
 Sends macOS notifications + optional Slack alerts for leads scoring 8+.
 Set SLACK_WEBHOOK_URL in .env for Slack integration.

@@ -14,13 +14,13 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/reddit-scraper.js $ARGUMENTS
+node scripts/reddit-scraper.js $ARGUMENTS
 ```
 
 If no arguments provided, show the usage and ask what to scrape:
 ```
-Usage: node Skills/reddit-scraper.js <url1> [url2] [options]
-       node Skills/reddit-scraper.js --fetch-comments <leads.json> --topic <Name>
+Usage: node scripts/reddit-scraper.js <url1> [url2] [options]
+       node scripts/reddit-scraper.js --fetch-comments <leads.json> --topic <Name>
 
 Options:
   --topic <Name>            Topic directory for output (e.g., IdentityManagement, GRC)

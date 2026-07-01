@@ -9,16 +9,16 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/notify.js $ARGUMENTS
+node scripts/notify.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage and look for recent leads files:
 ```
-Usage: node Skills/notify.js <leads-json-file>
+Usage: node scripts/notify.js <leads-json-file>
 
 Examples:
-  node Skills/notify.js IdentityManagement/Leads/leads-2026-03-20.json
-  node Skills/notify.js GRC/Leads/leads-2026-03-20.json
+  node scripts/notify.js IdentityManagement/Leads/leads-2026-03-20.json
+  node scripts/notify.js GRC/Leads/leads-2026-03-20.json
 
 Slack setup (optional): Add SLACK_WEBHOOK_URL to .env
 ```

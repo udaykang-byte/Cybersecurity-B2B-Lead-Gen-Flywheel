@@ -9,12 +9,12 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/schedule.js $ARGUMENTS
+node scripts/schedule.js $ARGUMENTS
 ```
 
 If no arguments provided, run all scheduled jobs:
 ```
-Usage: node Skills/schedule.js [options]
+Usage: node scripts/schedule.js [options]
 
 Options:
   (no args)     Run all scheduled scrape jobs now

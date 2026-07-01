@@ -9,12 +9,12 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/linkedin-companies.js $ARGUMENTS
+node scripts/linkedin-companies.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage:
 ```
-Usage: node Skills/linkedin-companies.js <csv-file> [options]
+Usage: node scripts/linkedin-companies.js <csv-file> [options]
 
 CSV Input:
   Accepts a CSV with a LinkedIn company URL column (auto-detected).
@@ -28,8 +28,8 @@ Options:
   --dry-run               Print companies to scrape without calling Apify
 
 Examples:
-  node Skills/linkedin-companies.js target-accounts.csv --topic IdentityManagement
-  node Skills/linkedin-companies.js accounts.csv --max-companies 10 --dry-run
+  node scripts/linkedin-companies.js target-accounts.csv --topic IdentityManagement
+  node scripts/linkedin-companies.js accounts.csv --max-companies 10 --dry-run
 ```
 
 After enrichment completes:

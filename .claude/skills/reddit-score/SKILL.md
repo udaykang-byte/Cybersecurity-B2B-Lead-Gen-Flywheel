@@ -9,16 +9,16 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/lead-scorer.js $ARGUMENTS
+node scripts/lead-scorer.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage and look for recent scrape files:
 ```
-Usage: node Skills/lead-scorer.js <scraped-json-file> [--topic <Name>] [--since <duration>]
+Usage: node scripts/lead-scorer.js <scraped-json-file> [--topic <Name>] [--since <duration>]
 
 Examples:
-  node Skills/lead-scorer.js IdentityManagement/Scrapes/scrape-2026-03-20.json --topic IdentityManagement
-  node Skills/lead-scorer.js GRC/Scrapes/scrape-2026-03-20.json --topic GRC
+  node scripts/lead-scorer.js IdentityManagement/Scrapes/scrape-2026-03-20.json --topic IdentityManagement
+  node scripts/lead-scorer.js GRC/Scrapes/scrape-2026-03-20.json --topic GRC
 ```
 
 After Step 1 completes:
@@ -27,7 +27,7 @@ After Step 1 completes:
 3. Score leads on a 1-10 scale, classify as HOT (8+), WARM (5-7), or COLD (1-4)
 4. Write scored output to `<Topic>/Leads/leads-<timestamp>.json` and `.md`
 5. Report the score distribution and highlight any HOT leads
-6. **Run the Supabase sync:** `node Skills/supabase-sync.js <Topic>/Leads/leads-<timestamp>.json` to push scores into Supabase
+6. **Run the Supabase sync:** `node scripts/supabase-sync.js <Topic>/Leads/leads-<timestamp>.json` to push scores into Supabase
 7. Suggest running `/reddit-enrich` on HOT/WARM leads as the next step
 
 ## PAM-Specific Scoring Guidance

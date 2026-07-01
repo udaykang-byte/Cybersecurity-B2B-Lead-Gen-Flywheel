@@ -9,12 +9,12 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/linkedin-people.js $ARGUMENTS
+node scripts/linkedin-people.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage:
 ```
-Usage: node Skills/linkedin-people.js [options]
+Usage: node scripts/linkedin-people.js [options]
 
 Options:
   --topic <Name>          Topic directory for output (default: auto)
@@ -24,8 +24,8 @@ Options:
   --dry-run               Print queries without calling Apify
 
 Examples:
-  node Skills/linkedin-people.js --topic IdentityManagement --category ciso --since 90d
-  node Skills/linkedin-people.js --category director --max-results 10
+  node scripts/linkedin-people.js --topic IdentityManagement --category ciso --since 90d
+  node scripts/linkedin-people.js --category director --max-results 10
 ```
 
 After the scan completes:

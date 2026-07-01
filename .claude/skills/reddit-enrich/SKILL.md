@@ -9,12 +9,12 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/enrich-leads.js $ARGUMENTS
+node scripts/enrich-leads.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage and look for recent leads files:
 ```
-Usage: node Skills/enrich-leads.js <leads-json-file> --topic <Name> [options]
+Usage: node scripts/enrich-leads.js <leads-json-file> --topic <Name> [options]
 
 Options:
   --topic <Name>        Topic directory (required)

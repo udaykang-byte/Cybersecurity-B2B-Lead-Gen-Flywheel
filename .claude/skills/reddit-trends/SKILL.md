@@ -9,16 +9,16 @@ Arguments provided: $ARGUMENTS
 
 Run:
 ```bash
-node Skills/trends.js $ARGUMENTS
+node scripts/trends.js $ARGUMENTS
 ```
 
 If no arguments provided, show usage:
 ```
-Usage: node Skills/trends.js <Topic>
+Usage: node scripts/trends.js <Topic>
 
 Examples:
-  node Skills/trends.js IdentityManagement
-  node Skills/trends.js GRC
+  node scripts/trends.js IdentityManagement
+  node scripts/trends.js GRC
 ```
 
 After analysis completes:

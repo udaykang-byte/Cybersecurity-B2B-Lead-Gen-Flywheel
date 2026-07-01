@@ -8,11 +8,11 @@
  * Claude to analyze and score.
  *
  * Usage:
- *   node Skills/lead-scorer.js <scraped-json-file> [--topic <Name>] [--since <duration>]
+ *   node scripts/lead-scorer.js <scraped-json-file> [--topic <Name>] [--since <duration>]
  *
  * Examples:
- *   node Skills/lead-scorer.js IdentityManagement/Scrapes/scrape-2026-03-10T18-02.json --topic IdentityManagement
- *   node Skills/lead-scorer.js GRC/Scrapes/scrape-2026-03-10T16-42.json --topic GRC
+ *   node scripts/lead-scorer.js IdentityManagement/Scrapes/scrape-2026-03-10T18-02.json --topic IdentityManagement
+ *   node scripts/lead-scorer.js GRC/Scrapes/scrape-2026-03-10T16-42.json --topic GRC
  *
  * Output:
  *   With --topic:    <Topic>/pending-leads.txt  ← formatted for Claude analysis
@@ -36,11 +36,11 @@ if (args.length === 0) {
 Reddit Lead Scorer — Step 1 of 2
 
 Usage:
-  node Skills/lead-scorer.js <scraped-json-file> [--topic <Name>]
+  node scripts/lead-scorer.js <scraped-json-file> [--topic <Name>]
 
 Examples:
-  node Skills/lead-scorer.js IdentityManagement/Scrapes/scrape-2026-03-10T18-02.json --topic IdentityManagement
-  node Skills/lead-scorer.js GRC/Scrapes/scrape-2026-03-10T16-42.json --topic GRC
+  node scripts/lead-scorer.js IdentityManagement/Scrapes/scrape-2026-03-10T18-02.json --topic IdentityManagement
+  node scripts/lead-scorer.js GRC/Scrapes/scrape-2026-03-10T16-42.json --topic GRC
 
 This formats the scraped data for Claude to score as leads.
 After running, ask Claude: "Score the leads in <pending-leads-file>"

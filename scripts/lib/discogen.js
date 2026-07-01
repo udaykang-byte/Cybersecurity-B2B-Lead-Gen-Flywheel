@@ -21,7 +21,7 @@
  * To test with live credentials:
  *   1. Set DISCOGEN_API_KEY in .env
  *   2. Update DISCOGEN_HOSTNAME and buildRequestBody() below
- *   3. Run: node Skills/lib/discogen.js "Acme Corp" "acmecorp.com"
+ *   3. Run: node scripts/lib/discogen.js "Acme Corp" "acmecorp.com"
  */
 
 import https from 'https';
@@ -247,7 +247,7 @@ export function isConfigured() {
 }
 
 // ── CLI test (run directly to verify integration) ──
-// Usage: node Skills/lib/discogen.js "Acme Corp" "acmecorp.com"
+// Usage: node scripts/lib/discogen.js "Acme Corp" "acmecorp.com"
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     const companyName = process.argv[2] || 'Acme Corp';
     const domain = process.argv[3] || null;
