@@ -56,6 +56,22 @@ test('duplicate types keep the strongest only, capped at 50', () => {
     assert.equal(r.score, 50); // 45+25+40=110 → cap 50
 });
 
+test('extra unrelated signal does not disable a stack', () => {
+    const r = scoreAccount([sig('new_ciso_hired', 5), sig('competitor_in_jd', 3), sig('cloud_migration', 0)], cfg, NOW);
+    assert.equal(r.isStack, true);
+    assert.equal(r.stackLabel, 'New CISO hired + CyberArk/SailPoint job posting');
+    // stack 47 × 0.9549 = 44.88 + residual 28 (fresh cloud_migration) = 72.88 → cap 50
+    assert.equal(r.score, 50);
+});
+
+test('calibrated stack value governs even when naive sum is higher', () => {
+    const r = scoreAccount([sig('hiring_security_grc', 0), sig('social_pain_post', 0)], cfg, NOW);
+    // naive sum 25+22=47, but the Playbook calibrates this pair at 38
+    assert.equal(r.isStack, true);
+    assert.equal(r.score, 38);
+    assert.equal(r.stackLabel, 'Hiring access management + LinkedIn pain post');
+});
+
 test('getTier boundaries', () => {
     assert.equal(getTier(35, cfg.tiers).tier, 'CRITICAL');
     assert.equal(getTier(34, cfg.tiers).tier, 'HIGH');

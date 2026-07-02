@@ -47,23 +47,26 @@ export function scoreAccount(signals, config, now = new Date()) {
     // Calculate base score first
     const baseScore = Math.min(50, Math.round(sum));
 
-    // Find firing stacks and their scores
-    // A stack is used only if ALL detected signals are part of that stack
+    // Find firing stacks and their calibrated scores.
+    // A stack fires when ALL of its member types are among the detected types
+    // (a one-directional subset check). Extra detected types outside the stack
+    // must never disable it — they instead contribute a residual on top of the
+    // Playbook's calibrated combined value for the stack.
     let bestStack = null;
     for (const stack of config.signalStacks || []) {
-        // All members of the stack must be detected
         if (!stack.signals.every(t => detectedTypes.has(t))) continue;
-        // All detected signals must be in this stack (or no non-stack signals)
-        const allDetectedInStack = [...detectedTypes].every(t => stack.signals.includes(t));
-        if (!allDetectedInStack) continue;
 
         const weakest = Math.min(...stack.signals.map(t => {
             const v = best.get(t);
             return v.decayFactor * v.signal.confidence;
         }));
-        const stackScore = Math.min(50, Math.round(stack.combined * weakest));
+        // Residual: raw (unrounded) effective points of detected types NOT in this stack
+        const residual = [...detectedTypes]
+            .filter(t => !stack.signals.includes(t))
+            .reduce((acc, t) => acc + best.get(t).effective, 0);
+        const stackScore = Math.min(50, Math.round(stack.combined * weakest + residual));
 
-        // Use the best stack (highest score)
+        // Use the best stack (highest calibrated score)
         if (!bestStack || stackScore > bestStack.score) {
             bestStack = { score: stackScore, label: stack.label, meaning: stack.meaning };
         }
