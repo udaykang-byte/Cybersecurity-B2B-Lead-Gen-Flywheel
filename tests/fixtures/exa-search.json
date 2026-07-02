@@ -1,0 +1,12 @@
+{
+  "results": [
+    { "title": "Okta security incident: support system compromised",
+      "url": "https://example-news.test/exa-okta-breach",
+      "publishedDate": "2026-04-20T00:00:00.000Z",
+      "text": "Okta confirmed a data breach affecting customer support files." },
+    { "title": "Widget market trends 2026",
+      "url": "https://example-news.test/widgets",
+      "publishedDate": "2026-04-25T00:00:00.000Z",
+      "text": "No security content here." }
+  ]
+}
