@@ -1,0 +1,5 @@
+{
+  "client": "_test_acme",
+  "detectionFloor": 10,
+  "signalDefs": { "breach_announced": { "base": 40 } }
+}
