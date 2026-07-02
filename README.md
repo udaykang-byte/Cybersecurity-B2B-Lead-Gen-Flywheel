@@ -10,7 +10,8 @@ A cybersecurity B2B lead-generation pipeline that scrapes Reddit and LinkedIn fo
 - **Account qualification** — FITS framework (Firmographic, Intent, Technographic, Structural) scoring on top of the raw signals.
 - **Supabase data layer** — optional cross-topic deduplication and a unified account view (falls back to local dedup files when not configured).
 - **Slash-command skills** — every stage is also exposed as a Claude Code skill under `.claude/skills/`.
-- **Enrichment** — profile scraping plus Perplexity / Exa research (and optional Sherlock) to attach real names, companies, and contact paths.
+- **Enrichment** — profile scraping plus Parallel.ai / Exa news research + free registries (HHS OCR, SEC EDGAR, ransomware.live, Maine AG) + Greenhouse/Lever/Ashby job boards (and optional Sherlock) to attach real names, companies, and contact paths.
+- **Per-client playbooks** — scoring weights, competitor lists, and ICP live in `clients/<name>.json`; decayed, confidence-weighted scoring.
 
 ## The Pipeline
 
@@ -20,7 +21,7 @@ LinkedIn:  Step 6: Scan LinkedIn (Jobs / People / Companies / Feed)
                                     ↓
                            Supabase (all signals)
                                     ↓
-                    Step 7: Account Signals + Discogen → Qualify Accounts
+                    Step 7: Account Signals (Parallel.ai/Exa + registries) → Qualify Accounts
                                     ↓
            Step 4: Review  →  Step 5: Enrich  →  Notify HOT Leads
 ```
@@ -29,7 +30,7 @@ LinkedIn:  Step 6: Scan LinkedIn (Jobs / People / Companies / Feed)
 
 ```
 scripts/                 Node pipeline (scraper, scorer, enrich, LinkedIn scanners, schedule, notify)
-  lib/                   Shared helpers (supabase, discogen)
+  lib/                   Shared helpers (supabase, client-config, scoring, signals/*)
 .claude/skills/          Claude Code slash-command wrappers for each stage
 supabase/migrations/     Postgres schema (companies + signal tables, dedup constraints)
 scrape-config.json       Topics, search URLs, and scheduled scans
@@ -39,7 +40,7 @@ data/                    All generated output — gitignored, never committed
 
 ## Setup
 
-1. Copy `.env.example` to `.env` and fill in your API keys (Apify token required; Supabase, Discogen, Perplexity, Exa optional).
+1. Copy `.env.example` to `.env` and fill in your API keys (Apify token required; Supabase, Parallel.ai, Perplexity, Exa optional).
 2. If using Supabase, run `supabase/migrations/001_initial_schema.sql` in the Supabase SQL Editor to create the schema.
 
 ```bash

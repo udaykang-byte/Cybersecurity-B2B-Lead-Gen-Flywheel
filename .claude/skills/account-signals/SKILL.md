@@ -3,7 +3,7 @@ name: account-signals
 description: Score and rank target accounts by cybersecurity buying signals using the Intent Signals Playbook model
 ---
 
-Run the account signal scoring pipeline. Takes a CSV of LinkedIn company URLs, gathers signals from LinkedIn enrichment, Exa.ai news research (breach, funding, CISO hires, M&A, cloud migration), HHS OCR breach data, and existing local job/feed scan data. Scores each account using the calibrated Intent Signals Playbook model (out of 50), detects high-value signal stacks, and ranks accounts by urgency tier.
+Run the account signal scoring pipeline. Takes a CSV of target companies (LinkedIn URLs and/or domains), fans out across per-account signal adapters — Parallel.ai / Exa.ai news research (breach, funding, CISO hires, M&A, cloud migration), HHS OCR and Maine AG breach registries, SEC EDGAR full-text search, ransomware.live, Greenhouse/Lever/Ashby job boards, LinkedIn company enrichment, and existing local job/feed scan data — then scores each account with decayed, confidence-weighted signals against the calibrated Intent Signals Playbook model, detects high-value signal stacks, discovers likely decision-makers, and ranks accounts by urgency tier. Scoring weights, competitor lists, and ICP definitions come from a per-client config in `clients/<name>.json`.
 
 Arguments provided: $ARGUMENTS
 
@@ -25,11 +25,13 @@ CSV Format:
     Acme Corp,https://linkedin.com/company/acme-corp
 
 Options:
-  --min-score <N>     Only include accounts scoring >= N (default: 15)
-  --no-enrich         Skip Exa.ai research, use local data only (faster, free)
-  --no-linkedin       Skip LinkedIn Apify enrichment
-  --no-notify         Skip Slack/macOS notifications
-  --dry-run           Show accounts without making API calls
+  --client <name>      Client config from clients/<name>.json (default: default)
+  --min-score <N>       Only include accounts scoring >= N (default: 15)
+  --no-enrich           Skip news/registry/job-board adapters, use local data only (faster, free)
+  --no-linkedin         Skip LinkedIn Apify company enrichment
+  --no-people           Skip decision-maker discovery
+  --no-notify           Skip Slack/macOS notifications
+  --dry-run             Show the plan without making API calls
 
 Scoring tiers:
   CRITICAL (35-50): 24-48hr outreach
@@ -39,7 +41,7 @@ Scoring tiers:
 
 Examples:
   node scripts/account-signals.js target-accounts.csv
-  node scripts/account-signals.js accounts.csv --min-score 28
+  node scripts/account-signals.js accounts.csv --client acme --min-score 28
   node scripts/account-signals.js urls.csv --no-enrich
 ```
 
@@ -47,5 +49,5 @@ After scoring completes:
 1. Report the tier breakdown (CRITICAL / HIGH / MEDIUM / LOW counts)
 2. List the top 5 accounts with their scores, detected signals, and why they're urgent
 3. Highlight any high-value signal stacks detected (e.g. "New CISO + CyberArk JD = 47/50")
-4. Tell the user where the full ranked report was saved (AccountSignals/<timestamp>/)
-5. Note any accounts flagged for 24-48hr outreach
+4. Tell the user where the full ranked report was saved (`data/AccountSignals/<timestamp>/ranked-accounts.md`, with per-account briefs under `accounts/<slug>.md`)
+5. Note any signal sources that were unavailable this run (shown per-account under "Sources unavailable this run") and any accounts flagged for 24-48hr outreach
