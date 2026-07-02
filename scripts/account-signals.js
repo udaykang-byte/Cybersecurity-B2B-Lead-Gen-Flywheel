@@ -368,7 +368,7 @@ if (isMain) {
                    enrich: true, linkedin: true, people: true, notify: true, dryRun: false };
     for (let i = 1; i < args.length; i++) {
         if (args[i] === '--client') opts.client = args[++i];
-        else if (args[i] === '--min-score') opts.minScore = parseInt(args[++i]) || 15;
+        else if (args[i] === '--min-score') { const n = parseInt(args[++i], 10); opts.minScore = Number.isNaN(n) ? 15 : n; }
         else if (args[i] === '--no-enrich') opts.enrich = false;
         else if (args[i] === '--no-linkedin') opts.linkedin = false;
         else if (args[i] === '--no-people') opts.people = false;
