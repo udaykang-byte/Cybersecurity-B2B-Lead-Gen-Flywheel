@@ -587,6 +587,7 @@ Each source runs independently — if one fails (missing auth, upstream outage, 
 ```
 --client <name>      Client config from clients/<name>.json (default: default)
 --min-score <N>      Only include accounts scoring >= N (default: 15)
+--max-companies <N>  Only process the first N accounts from the CSV
 --no-enrich          Skip news/registry/job-board adapters (local data only, faster, free)
 --no-linkedin        Skip LinkedIn Apify company enrichment
 --no-people          Skip decision-maker discovery
