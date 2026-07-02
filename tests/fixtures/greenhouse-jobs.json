@@ -1,0 +1,14 @@
+{ "jobs": [
+  { "id": 111, "title": "Senior IAM Engineer",
+    "absolute_url": "https://boards.greenhouse.io/acme/jobs/111",
+    "updated_at": "2026-06-20T12:00:00-04:00",
+    "content": "Administer &lt;strong&gt;CyberArk&lt;/strong&gt; and Okta. Support our SOC 2 audit. Fix orphaned accounts." },
+  { "id": 222, "title": "Chief Information Security Officer (CISO)",
+    "absolute_url": "https://boards.greenhouse.io/acme/jobs/222",
+    "updated_at": "2026-06-25T12:00:00-04:00",
+    "content": "Own security strategy and access reviews." },
+  { "id": 333, "title": "Backend Engineer",
+    "absolute_url": "https://boards.greenhouse.io/acme/jobs/333",
+    "updated_at": "2026-06-01T12:00:00-04:00",
+    "content": "Build APIs." }
+] }
