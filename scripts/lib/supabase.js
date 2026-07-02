@@ -263,4 +263,32 @@ function isConfigured() {
     return !!(SUPABASE_URL && SUPABASE_KEY);
 }
 
-export default { select, insert, upsert, update, exists, findOrCreateCompany, isConfigured };
+// ── Shape a companies row (shared by both findOrCreate paths) ──
+export function buildCompanyRow(companyData) {
+    const now = new Date().toISOString();
+    return {
+        name:           companyData.name || null,
+        domain:         companyData.domain || null,
+        linkedin_url:   companyData.linkedin_url || null,
+        website:        companyData.website || null,
+        industry:       companyData.industry || null,
+        employee_count: companyData.employee_count || null,
+        segment:        companyData.segment || null,
+        location:       companyData.location || null,
+        updated_at:     now,
+        last_seen_at:   now
+    };
+}
+
+// ── FIND OR CREATE by domain (canonical key), fallback to linkedin_url ──
+async function findOrCreateCompanyByDomain(companyData) {
+    assertConfigured();
+    if (!companyData.domain) return findOrCreateCompany(companyData);
+    const rows = await upsert('companies', buildCompanyRow(companyData), 'domain');
+    if (rows.length > 0) return rows[0].id;
+    const existing = await select('companies', { domain: `eq.${companyData.domain}`, select: 'id', limit: 1 });
+    if (existing.length > 0) return existing[0].id;
+    throw new Error(`Failed to find or create company by domain: ${companyData.domain}`);
+}
+
+export default { select, insert, upsert, update, exists, findOrCreateCompany, findOrCreateCompanyByDomain, isConfigured };
