@@ -1,0 +1,6 @@
+{ "hits": { "hits": [
+  { "_id": "0001234567-26-000042:acme-8k.htm",
+    "_source": { "display_names": ["Acme Corp  (ACME)  (CIK 0001234567)"], "file_date": "2026-06-10", "file_type": "8-K" } },
+  { "_id": "0009876543-26-000099:other-8k.htm",
+    "_source": { "display_names": ["Globex Industries  (CIK 0009876543)"], "file_date": "2026-05-01", "file_type": "8-K" } }
+] } }
