@@ -73,10 +73,15 @@ function parseCSVLine(line) {
 
 export function parseAccountsCSV(filePath) {
     const lines = fs.readFileSync(filePath, 'utf8').split('\n').map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return [];
     const accounts = [];
     let urlCol = -1, nameCol = -1, domainCol = -1, headerSkipped = false;
     const first = parseCSVLine(lines[0]);
-    const isHeader = !first.some(f => f.includes('linkedin.com'));
+    // Only treat the first line as a header if it looks like one (has a
+    // recognizable column name) and doesn't already contain a LinkedIn URL
+    // (which would mean it's the first data row of a header-less file).
+    const isHeader = !first.some(f => f.includes('linkedin.com')) &&
+        first.some(f => /name|url|domain|website|company/i.test(f));
     if (isHeader) {
         urlCol = first.findIndex(f => /linkedin/i.test(f));
         nameCol = first.findIndex(f => /name/i.test(f));
@@ -85,13 +90,15 @@ export function parseAccountsCSV(filePath) {
     }
     for (const line of lines.slice(headerSkipped ? 1 : 0)) {
         const fields = parseCSVLine(line);
-        const url = urlCol >= 0 ? fields[urlCol] : fields.find(f => f.includes('linkedin.com')) || fields[0];
-        if (!url) continue;
+        const urlField = urlCol >= 0 ? fields[urlCol] : fields.find(f => f.includes('linkedin.com'));
+        const url = (urlField || '').trim();
         let domain = domainCol >= 0 ? (fields[domainCol] || '').trim() : null;
         if (domain) domain = domain.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase() || null;
+        const name = nameCol >= 0 ? (fields[nameCol] || '').trim() : '';
+        if (!url && !domain && !name) continue; // fully blank/unusable row
         accounts.push({
-            name: nameCol >= 0 ? (fields[nameCol] || '').trim() : '',
-            linkedinUrl: normalizeCompanyUrl(url.trim()),
+            name,
+            linkedinUrl: url ? normalizeCompanyUrl(url) : null,
             domain
         });
     }
@@ -134,6 +141,10 @@ export async function processAccount(account, config, adapters, deps = {}) {
     settled.forEach((s, i) => {
         const adapterName = adapters[i].name;
         if (s.status === 'fulfilled') {
+            if (!Array.isArray(s.value)) {
+                adapterStatus[adapterName] = { error: 'adapter returned non-array result' };
+                return;
+            }
             let kept = 0;
             for (const sig of s.value) {
                 const key = `${sig.type}|${sig.url || sig.evidence}`;
@@ -225,6 +236,13 @@ function renderBrief(p, people, config) {
     return lines.join('\n');
 }
 
+// Highest-`effective` breakdown entry — same ordering renderBrief's table uses.
+// (breakdown[0] is just insertion order, not the strongest signal.)
+function topSignal(breakdown) {
+    if (!breakdown || !breakdown.length) return null;
+    return breakdown.reduce((max, b) => (b.effective > max.effective ? b : max), breakdown[0]);
+}
+
 function renderRankedReport(rankedRows, meta) {
     const lines = [
         `# Account Signals — ${meta.timestamp}`, '',
@@ -232,7 +250,7 @@ function renderRankedReport(rankedRows, meta) {
         '| # | Company | Score | Tier | Top Signal | Action |', '|---|---|---|---|---|---|'
     ];
     rankedRows.forEach((p, i) => {
-        const top = p.result.breakdown[0];
+        const top = topSignal(p.result.breakdown);
         lines.push(`| ${i + 1} | ${p.company.name} | ${p.result.score}/50 | ${p.result.emoji} ${p.result.tier} | ${p.result.isStack ? p.result.stackLabel : (top?.label || '—')} | ${p.result.action} |`);
     });
     return lines.join('\n');
@@ -242,7 +260,7 @@ function renderRankedReport(rankedRows, meta) {
 function notifyHot(rankedRows, config) {
     const hot = rankedRows.filter(p => p.result.tier === 'CRITICAL' || p.result.tier === 'HIGH');
     if (!hot.length) return;
-    const text = hot.map(p => `${p.result.emoji} ${p.company.name}: ${p.result.score}/50 (${p.result.tier}) — ${p.result.isStack ? p.result.stackLabel : p.result.breakdown[0]?.label || ''}`).join('\n');
+    const text = hot.map(p => `${p.result.emoji} ${p.company.name}: ${p.result.score}/50 (${p.result.tier}) — ${p.result.isStack ? p.result.stackLabel : topSignal(p.result.breakdown)?.label || ''}`).join('\n');
     if (config.notify?.slack && process.env.SLACK_WEBHOOK_URL) {
         fetch(process.env.SLACK_WEBHOOK_URL, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -258,10 +276,15 @@ function notifyHot(rankedRows, config) {
 
 // ── Main ──
 export async function run(options) {
-    const { csvFile, client = 'default', minScore = 15, enrich = true,
+    const { csvFile, client = 'default', minScore = 15, enrich = true, maxCompanies = null,
             linkedin = true, people = true, notify = true, dryRun = false } = options;
     const config = loadClientConfig(client);
-    const accounts = parseAccountsCSV(csvFile);
+    let accounts = parseAccountsCSV(csvFile);
+    if (!accounts.length) {
+        console.log(`CSV contains no accounts: ${csvFile}`);
+        return { accounts: [] };
+    }
+    if (maxCompanies) accounts = accounts.slice(0, maxCompanies);
     const adapters = buildAdapters(config, { enrich });
 
     console.log(`\nAccount Signal Orchestrator — client "${config.client}"`);
@@ -269,7 +292,7 @@ export async function run(options) {
 
     if (dryRun) {
         console.log('\nDRY RUN — no API calls.');
-        for (const a of accounts) console.log(`  ${a.name || '(name via enrichment)'} — ${a.linkedinUrl} — ${a.domain || 'domain via enrichment'}`);
+        for (const a of accounts) console.log(`  ${a.name || '(name via enrichment)'} — ${a.linkedinUrl || '(no linkedin url)'} — ${a.domain || 'domain via enrichment'}`);
         return { dryRun: true, accounts };
     }
 
@@ -285,7 +308,7 @@ export async function run(options) {
     // LinkedIn enrichment fills missing names/domains (and firmographics)
     if (linkedin) {
         try {
-            const enriched = await enrichCompanies(accounts.map(a => a.linkedinUrl));
+            const enriched = await enrichCompanies(accounts.map(a => a.linkedinUrl).filter(Boolean));
             for (const a of accounts) {
                 const data = enriched.get(a.linkedinUrl);
                 if (!data) continue;
@@ -308,7 +331,7 @@ export async function run(options) {
     const processedAll = [];
     const runStatus = {};
     for (const account of accounts) {
-        if (!account.name) account.name = (account.linkedinUrl.match(/\/company\/([^/?]+)/)?.[1] || '').replace(/-/g, ' ');
+        if (!account.name && account.linkedinUrl) account.name = (account.linkedinUrl.match(/\/company\/([^/?]+)/)?.[1] || '').replace(/-/g, ' ');
         console.log(`\n→ ${account.name}`);
         const p = await processAccount(account, config, adapters);
         if (p.disqualified) { console.log(`  DISQUALIFIED (competitor: ${p.disqualified})`); processedAll.push(p); continue; }
@@ -361,14 +384,16 @@ const isMain = process.argv[1] && fileURLToPath(import.meta.url) === path.resolv
 if (isMain) {
     const args = process.argv.slice(2);
     if (!args.length || args[0].startsWith('--help')) {
-        console.log('Usage: node scripts/account-signals.js <csv-file> [--client <name>] [--min-score N] [--no-enrich] [--no-linkedin] [--no-people] [--no-notify] [--dry-run]');
+        console.log('Usage: node scripts/account-signals.js <csv-file> [--client <name>] [--min-score N] [--max-companies N] [--enrich] [--no-enrich] [--no-linkedin] [--no-people] [--no-notify] [--dry-run]');
         process.exit(0);
     }
-    const opts = { csvFile: args[0], client: 'default', minScore: 15,
+    const opts = { csvFile: args[0], client: 'default', minScore: 15, maxCompanies: null,
                    enrich: true, linkedin: true, people: true, notify: true, dryRun: false };
     for (let i = 1; i < args.length; i++) {
         if (args[i] === '--client') opts.client = args[++i];
         else if (args[i] === '--min-score') { const n = parseInt(args[++i], 10); opts.minScore = Number.isNaN(n) ? 15 : n; }
+        else if (args[i] === '--max-companies') { const n = parseInt(args[++i], 10); opts.maxCompanies = Number.isNaN(n) ? null : n; }
+        else if (args[i] === '--enrich') opts.enrich = true;
         else if (args[i] === '--no-enrich') opts.enrich = false;
         else if (args[i] === '--no-linkedin') opts.linkedin = false;
         else if (args[i] === '--no-people') opts.people = false;

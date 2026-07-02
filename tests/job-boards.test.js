@@ -43,3 +43,33 @@ test('no board found → empty array, no throw', async () => {
     });
     assert.deepEqual(signals, []);
 });
+
+test('"Brand Designer, Identity" is not a security posting (no false-positive signals)', async () => {
+    const fixture = { jobs: [
+        { id: 501, title: 'Brand Designer, Identity',
+          absolute_url: 'https://boards.greenhouse.io/acme/jobs/501',
+          updated_at: '2026-06-20T12:00:00-04:00',
+          content: 'Own our brand identity system and visual design language.' }
+    ] };
+    const fj = async url => {
+        if (url.includes('boards-api.greenhouse.io/v1/boards/acme/jobs')) return fixture;
+        throw new Error('404');
+    };
+    const signals = await fetchSignals(acme, cfg, { fetchJson: fj, seenStore: memStore() });
+    assert.deepEqual(signals, []);
+});
+
+test('"Director of Identity and Access Management" is treated as a security posting', async () => {
+    const fixture = { jobs: [
+        { id: 502, title: 'Director of Identity and Access Management',
+          absolute_url: 'https://boards.greenhouse.io/acme/jobs/502',
+          updated_at: '2026-06-20T12:00:00-04:00',
+          content: 'Lead our IAM program across the enterprise.' }
+    ] };
+    const fj = async url => {
+        if (url.includes('boards-api.greenhouse.io/v1/boards/acme/jobs')) return fixture;
+        throw new Error('404');
+    };
+    const signals = await fetchSignals(acme, cfg, { fetchJson: fj, seenStore: memStore() });
+    assert.ok(signals.some(s => s.type === 'hiring_security_grc'));
+});

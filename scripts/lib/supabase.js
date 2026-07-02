@@ -281,9 +281,31 @@ export function buildCompanyRow(companyData) {
 }
 
 // ── FIND OR CREATE by domain (canonical key), fallback to linkedin_url ──
+// Companies created by other scripts (e.g. linkedin-companies.js) are keyed on
+// linkedin_url with domain NULL. Upserting straight onto 'domain' would insert
+// a second row sharing that same linkedin_url and 409 on its unique constraint.
+// So: look up by domain first, then by linkedin_url (reconciling that row by
+// setting its domain), and only insert fresh when neither key matches.
 async function findOrCreateCompanyByDomain(companyData) {
     assertConfigured();
     if (!companyData.domain) return findOrCreateCompany(companyData);
+
+    const byDomain = await select('companies', { domain: `eq.${companyData.domain}`, select: 'id', limit: 1 });
+    if (byDomain.length > 0) {
+        const id = byDomain[0].id;
+        await update('companies', { id: `eq.${id}` }, buildCompanyRow(companyData));
+        return id;
+    }
+
+    if (companyData.linkedin_url) {
+        const byLinkedin = await select('companies', { linkedin_url: `eq.${companyData.linkedin_url}`, select: 'id', limit: 1 });
+        if (byLinkedin.length > 0) {
+            const id = byLinkedin[0].id;
+            await update('companies', { id: `eq.${id}` }, buildCompanyRow(companyData));
+            return id;
+        }
+    }
+
     const rows = await upsert('companies', buildCompanyRow(companyData), 'domain');
     if (rows.length > 0) return rows[0].id;
     const existing = await select('companies', { domain: `eq.${companyData.domain}`, select: 'id', limit: 1 });

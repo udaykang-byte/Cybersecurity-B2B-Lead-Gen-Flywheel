@@ -24,6 +24,13 @@ const PATTERNS = [
 
 export function classifyNewsItem({ title = '', snippet = '' }) {
     const text = `${title} ${snippet}`.toLowerCase();
+    // Series A / seed headlines often also contain generic B/C-round keywords
+    // ("raised $", "funding round"), which would otherwise outvote the single
+    // Series A keyword in the generic pattern loop below. Short-circuit here
+    // so a real Series A/seed round is never misclassified as funding_bc_soc2.
+    if (/\bseries a\b|\bseed round\b/.test(text) && !/\bseries [b-d]\b/.test(text)) {
+        return { type: 'funding_a_only', confidence: 0.85 };
+    }
     let bestMatch = null;
     for (const p of PATTERNS) {
         const matches = p.keywords.filter(kw => text.includes(kw)).length;

@@ -580,7 +580,7 @@ node scripts/account-signals.js target-accounts.csv
 | Job boards (`job-boards`) | Greenhouse/Lever/Ashby postings — competitor tools, compliance frameworks, and CISO/IAM/GRC hiring signals in the JD |
 | Local scans (`local-scans`) | Rolls in existing LinkedIn jobs/people/feed scan data already saved under `data/` |
 
-Each source runs independently — if one fails (missing auth, upstream outage, rate limit), the run keeps going. Failed or empty sources for an account are listed under **"Sources unavailable this run"** in that account's brief instead of crashing the pipeline.
+Each source runs independently — if one fails (missing auth, upstream outage, rate limit), the run keeps going. Failed sources for an account are listed under **"Sources unavailable this run"** in that account's brief instead of crashing the pipeline.
 
 **Options:**
 

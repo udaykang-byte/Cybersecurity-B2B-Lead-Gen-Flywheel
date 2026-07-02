@@ -9,13 +9,20 @@ import { extractFromJD } from '../jd-extract.js';
 export const name = 'job-boards';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SEEN_FILE = path.join(__dirname, '..', '..', '..', 'data', '.cache', 'job-boards-seen.json');
-const SECURITY_TITLE = /security|iam\b|identity|privileged|\bpam\b|grc|compliance|ciso|infosec/i;
+const SECURITY_TITLE = /security|\biam\b|identity|privileged|\bpam\b|grc|compliance|ciso|infosec/i;
 const CISO_TITLE = /ciso|chief information security/i;
-const IAM_TITLE = /iam\b|identity|privileged|\bpam\b/i;
+const IAM_TITLE = /\biam\b|identity|privileged|\bpam\b/i;
+const NON_SECURITY_TITLE = /\b(brand|design|designer|visual|creative|graphic|copywriter|marketing)\b/i;
 
 const defaultSeenStore = {
     load() {
-        try { return JSON.parse(fs.readFileSync(SEEN_FILE, 'utf8')); } catch { return {}; }
+        try { return JSON.parse(fs.readFileSync(SEEN_FILE, 'utf8')); }
+        catch (err) {
+            if (err.code !== 'ENOENT') {
+                console.error('job-boards: seen-store unreadable, resetting first-seen history: ' + SEEN_FILE);
+            }
+            return {};
+        }
     },
     save(data) {
         fs.mkdirSync(path.dirname(SEEN_FILE), { recursive: true });
@@ -83,7 +90,7 @@ export async function fetchSignals(company, config, deps = {}) {
     }
     if (!postings) return [];
 
-    const secPostings = postings.filter(p => SECURITY_TITLE.test(p.title || ''));
+    const secPostings = postings.filter(p => SECURITY_TITLE.test(p.title || '') && !NON_SECURITY_TITLE.test(p.title || ''));
     if (!secPostings.length) return [];
 
     // First-seen dates → new postings become dated signal events

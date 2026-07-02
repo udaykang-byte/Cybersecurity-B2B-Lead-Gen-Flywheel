@@ -122,7 +122,7 @@ async function getActorResults(datasetId) {
 }
 
 function normalizeCompanyUrl(url) {
-    if (!url) return '';
+    if (!url) return null;
     try {
         const u = new URL(url);
         const parts = u.pathname.split('/').filter(Boolean);

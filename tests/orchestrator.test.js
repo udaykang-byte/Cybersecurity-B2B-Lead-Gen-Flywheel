@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildAdapters, processAccount } from '../scripts/account-signals.js';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { buildAdapters, processAccount, parseAccountsCSV } from '../scripts/account-signals.js';
 import { makeSignal } from '../scripts/lib/signals/signal.js';
 import { loadClientConfig } from '../scripts/lib/client-config.js';
 
@@ -51,4 +54,30 @@ test('competitor companies are disqualified before adapters run', async () => {
         linkedinUrl: 'https://linkedin.com/company/cyberark' }, cfg, [okAdapter], {});
     assert.equal(r.disqualified, 'cyberark');
     assert.equal(r.signals.length, 0);
+});
+
+test('a non-array adapter result is guarded, other adapters still score', async () => {
+    const undefinedAdapter = { name: 'fake-undefined', fetchSignals: async () => undefined };
+    const { adapterStatus, result } = await processAccount(acme, cfg, [okAdapter, undefinedAdapter], { now: TODAY_UTC_MIDNIGHT });
+    assert.deepEqual(adapterStatus['fake-undefined'], { error: 'adapter returned non-array result' });
+    assert.equal(adapterStatus['fake-ok'].ok, 1);
+    assert.equal(result.score, 45);
+});
+
+function writeTmpCsv(contents) {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'account-signals-csv-'));
+    const file = path.join(dir, 'accounts.csv');
+    fs.writeFileSync(file, contents);
+    return file;
+}
+
+test('parseAccountsCSV handles a domain-only CSV (no linkedin_url column)', () => {
+    const file = writeTmpCsv('company_name,domain\nAcme,acme.com\n');
+    const accounts = parseAccountsCSV(file);
+    assert.deepEqual(accounts, [{ name: 'Acme', linkedinUrl: null, domain: 'acme.com' }]);
+});
+
+test('parseAccountsCSV returns [] for an empty/whitespace-only file', () => {
+    const file = writeTmpCsv('   \n\n  ');
+    assert.deepEqual(parseAccountsCSV(file), []);
 });
