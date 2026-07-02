@@ -74,3 +74,24 @@ create or replace view v_account_scores as
 
 create or replace view v_hot_accounts as
     select * from v_account_scores where score >= 28;
+
+-- ============================================================
+-- Row Level Security (RLS) — same convention as migration 001:
+-- anon key read-only, service role full access (bypasses RLS).
+-- Policy creates are wrapped so the migration stays re-runnable.
+-- ============================================================
+alter table signal_events         enable row level security;
+alter table runs                  enable row level security;
+alter table account_signal_scores enable row level security;
+
+do $$ begin
+    create policy "anon_read_signal_events" on signal_events for select using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+    create policy "anon_read_runs" on runs for select using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+    create policy "anon_read_account_signal_scores" on account_signal_scores for select using (true);
+exception when duplicate_object then null; end $$;
