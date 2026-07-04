@@ -238,17 +238,9 @@ async function findOrCreateCompany(companyData) {
     if (!companyData.linkedin_url) {
         throw new Error('findOrCreateCompany requires a linkedin_url');
     }
-    const rows = await upsert('companies', {
-        name:           companyData.name || null,
-        linkedin_url:   companyData.linkedin_url,
-        website:        companyData.website || null,
-        industry:       companyData.industry || null,
-        employee_count: companyData.employee_count || null,
-        segment:        companyData.segment || null,
-        location:       companyData.location || null,
-        updated_at:     new Date().toISOString(),
-        last_seen_at:   new Date().toISOString()
-    }, 'linkedin_url');
+    const rows = await upsert('companies',
+        { ...buildCompanyPatch(companyData), linkedin_url: companyData.linkedin_url },
+        'linkedin_url');
 
     if (rows.length > 0) return rows[0].id;
 
@@ -280,6 +272,15 @@ export function buildCompanyRow(companyData) {
     };
 }
 
+// ── Sparse variant for writes onto possibly-existing rows: absent fields are
+// omitted (not sent as null), so a lean caller (e.g. account-signals with just
+// name+domain) never wipes enrichment data written by earlier runs ──
+export function buildCompanyPatch(companyData) {
+    return Object.fromEntries(
+        Object.entries(buildCompanyRow(companyData)).filter(([, v]) => v !== null)
+    );
+}
+
 // ── FIND OR CREATE by domain (canonical key), fallback to linkedin_url ──
 // Companies created by other scripts (e.g. linkedin-companies.js) are keyed on
 // linkedin_url with domain NULL. Upserting straight onto 'domain' would insert
@@ -293,7 +294,7 @@ async function findOrCreateCompanyByDomain(companyData) {
     const byDomain = await select('companies', { domain: `eq.${companyData.domain}`, select: 'id', limit: 1 });
     if (byDomain.length > 0) {
         const id = byDomain[0].id;
-        await update('companies', { id: `eq.${id}` }, buildCompanyRow(companyData));
+        await update('companies', { id: `eq.${id}` }, buildCompanyPatch(companyData));
         return id;
     }
 
@@ -301,12 +302,12 @@ async function findOrCreateCompanyByDomain(companyData) {
         const byLinkedin = await select('companies', { linkedin_url: `eq.${companyData.linkedin_url}`, select: 'id', limit: 1 });
         if (byLinkedin.length > 0) {
             const id = byLinkedin[0].id;
-            await update('companies', { id: `eq.${id}` }, buildCompanyRow(companyData));
+            await update('companies', { id: `eq.${id}` }, buildCompanyPatch(companyData));
             return id;
         }
     }
 
-    const rows = await upsert('companies', buildCompanyRow(companyData), 'domain');
+    const rows = await upsert('companies', buildCompanyPatch(companyData), 'domain');
     if (rows.length > 0) return rows[0].id;
     const existing = await select('companies', { domain: `eq.${companyData.domain}`, select: 'id', limit: 1 });
     if (existing.length > 0) return existing[0].id;
