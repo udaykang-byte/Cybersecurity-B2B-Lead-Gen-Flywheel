@@ -3,11 +3,16 @@
   "version": "1.0.0",
   "description": "Cybersecurity B2B lead-generation pipeline — scrapes Reddit & LinkedIn for IAM/PAM/DevSecOps/GRC buying signals, scores and enriches leads.",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "test": "node --test tests/*.test.js",
     "scrape": "node scripts/reddit-scraper.js",
     "schedule": "node scripts/schedule.js"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "supabase": "^2.109.0"
+  }
 }
