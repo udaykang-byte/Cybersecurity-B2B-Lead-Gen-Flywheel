@@ -9,17 +9,14 @@ import { mentionsCompany } from './classify-news.js';
 export const name = 'maine-ag-breach';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_CACHE_DIR = path.join(__dirname, '..', '..', '..', 'data', '.cache');
-// Verified in Task 7 Step 1 (2026-07-02) — this URL now 302s to
-// https://www.maine.gov/ag/consumer-protection/data-security-breaches, a static
-// Drupal page stating: "We were recently made aware of an apparent abuse of our
-// data breach reporting system... The public-facing database will remain
-// offline until then." The old agviewer list app (and the nav's "Data Breach
-// Notices" link, which meta-refreshes right back to this same URL) both dead-end
-// at that notice. There is currently no live, anonymous, parseable breach list
-// at Maine AG to verify the anchor-row markup against, so the URL/regex below
-// are kept exactly as specified in the brief. REVERIFY once the database is
-// restored — the anchorRe pattern is unverified against real markup.
+// This URL 302s to https://www.maine.gov/ag/consumer-protection/data-security-breaches,
+// a static Drupal page stating the public-facing database is offline after abuse of the
+// reporting system (still true as of 2026-07-04). fetchSignals detects that notice and
+// throws so the run reports "source unavailable" instead of silently claiming zero
+// Maine AG signals. REVERIFY the anchorRe pattern against real markup once the
+// database is restored — it is still unverified against the live list app.
 const LIST_URL = 'https://www.maine.gov/agviewer/content/ag/985235c7-cb95-4be2-8792-a1252b4f8318/list.html';
+const OFFLINE_RE = /public-facing database will remain offline|abuse of our data breach reporting system/i;
 const CACHE_TTL_MS = 24 * 3600 * 1000;
 
 async function loadHtml(fetchText, cacheDir) {
@@ -35,6 +32,9 @@ async function loadHtml(fetchText, cacheDir) {
 
 export async function fetchSignals(company, config, deps = {}) {
     const html = await loadHtml(deps.fetchText || defaultFetchText, deps.cacheDir || DEFAULT_CACHE_DIR);
+    if (OFFLINE_RE.test(html)) {
+        throw new Error('Maine AG breach database is offline (upstream abuse notice)');
+    }
     const signals = [];
     // Each entry: <a href="...">Org Name</a> ... optional "Date received: MM/DD/YYYY" nearby
     const anchorRe = /<a[^>]+href="([^"]+)"[^>]*>([^<]{3,120})<\/a>([^<]{0,120})/g;

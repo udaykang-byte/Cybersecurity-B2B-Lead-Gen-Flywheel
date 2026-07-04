@@ -7,8 +7,18 @@ import { fetchSignals } from '../scripts/lib/signals/maine-ag-breach.js';
 import { loadClientConfig } from '../scripts/lib/client-config.js';
 
 const html = fs.readFileSync(new URL('./fixtures/maine-ag-list.html', import.meta.url), 'utf8');
+const offlineHtml = fs.readFileSync(new URL('./fixtures/maine-ag-offline.html', import.meta.url), 'utf8');
 const cfg = loadClientConfig();
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'meag-'));
+
+test('offline-notice page throws instead of silently returning no signals', async () => {
+    const freshTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'meag-off-'));
+    await assert.rejects(
+        fetchSignals({ name: 'Acme Widgets', domain: 'acmewidgets.test' }, cfg,
+            { fetchText: async () => offlineHtml, cacheDir: freshTmp }),
+        /offline/i
+    );
+});
 
 test('matches org name in the AG list', async () => {
     const signals = await fetchSignals({ name: 'Acme Widgets', domain: 'acmewidgets.test' }, cfg,
