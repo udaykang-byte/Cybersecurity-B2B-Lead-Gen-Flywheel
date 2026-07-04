@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildAdapters, processAccount, parseAccountsCSV } from '../scripts/account-signals.js';
+import { buildAdapters, processAccount, parseAccountsCSV, dedupeSignalEvents } from '../scripts/account-signals.js';
 import { makeSignal } from '../scripts/lib/signals/signal.js';
 import { loadClientConfig } from '../scripts/lib/client-config.js';
 
@@ -80,4 +80,29 @@ test('parseAccountsCSV handles a domain-only CSV (no linkedin_url column)', () =
 test('parseAccountsCSV returns [] for an empty/whitespace-only file', () => {
     const file = writeTmpCsv('   \n\n  ');
     assert.deepEqual(parseAccountsCSV(file), []);
+});
+
+test('dedupeSignalEvents drops signals already stored for the company', () => {
+    const signals = [
+        { type: 'breach_announced', url: 'https://x.test/b' },
+        { type: 'new_ciso_hired', url: 'https://x.test/c' }
+    ];
+    const existing = [{ type: 'breach_announced', url: 'https://x.test/b' }];
+    assert.deepEqual(dedupeSignalEvents(signals, existing),
+        [{ type: 'new_ciso_hired', url: 'https://x.test/c' }]);
+});
+
+test('dedupeSignalEvents drops duplicates within the same batch', () => {
+    const signals = [
+        { type: 'breach_announced', url: 'https://x.test/b' },
+        { type: 'breach_announced', url: 'https://x.test/b' },
+        { type: 'breach_announced', url: 'https://x.test/other' }
+    ];
+    assert.equal(dedupeSignalEvents(signals, []).length, 2);
+});
+
+test('dedupeSignalEvents treats null and missing url as the same key', () => {
+    const signals = [{ type: 'hiring_security_grc', url: null }];
+    const existing = [{ type: 'hiring_security_grc' }];
+    assert.deepEqual(dedupeSignalEvents(signals, existing), []);
 });

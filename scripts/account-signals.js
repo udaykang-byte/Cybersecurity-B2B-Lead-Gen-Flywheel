@@ -164,6 +164,18 @@ export async function processAccount(account, config, adapters, deps = {}) {
 }
 
 // ── Persistence (Supabase optional) ──
+// Filter out signals already stored for this company AND duplicates within the
+// batch itself, keyed the same way as the signal_events_dedup index.
+export function dedupeSignalEvents(signals, existingRows) {
+    const seen = new Set(existingRows.map(r => `${r.type}|${r.url || ''}`));
+    return signals.filter(s => {
+        const key = `${s.type}|${s.url || ''}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
 async function persist(processed, people, config, runId) {
     if (!db.isConfigured()) return null;
     const companyId = await db.findOrCreateCompanyByDomain({
@@ -174,13 +186,21 @@ async function persist(processed, people, config, runId) {
         industry: processed.company.industry || null
     });
     if (processed.signals.length) {
-        await db.insert('signal_events', processed.signals.map(s => ({
-            company_id: companyId, client: config.client, type: s.type,
-            evidence: s.evidence, url: s.url, source: s.source, confidence: s.confidence,
-            base_points: config.signalDefs[s.type].base,
-            half_life_days: config.signalDefs[s.type].halfLifeDays,
-            observed_at: s.observedAt
-        })));
+        // signal_events_dedup is an expression index (coalesce(url,'')) that
+        // PostgREST ignore-duplicates can't target, so dedupe client-side.
+        const existing = await db.select('signal_events', {
+            company_id: `eq.${companyId}`, select: 'type,url'
+        });
+        const fresh = dedupeSignalEvents(processed.signals, existing);
+        if (fresh.length) {
+            await db.insert('signal_events', fresh.map(s => ({
+                company_id: companyId, client: config.client, type: s.type,
+                evidence: s.evidence, url: s.url, source: s.source, confidence: s.confidence,
+                base_points: config.signalDefs[s.type].base,
+                half_life_days: config.signalDefs[s.type].halfLifeDays,
+                observed_at: s.observedAt
+            })));
+        }
     }
     await db.insert('account_signal_scores', {
         run_id: runId, company_id: companyId, client: config.client,
