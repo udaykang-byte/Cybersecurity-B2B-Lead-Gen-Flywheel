@@ -56,14 +56,14 @@ Supabase stores all scraped data, scored leads, and signals in one place — ena
 
 > **What it enables:** All scrapers automatically dedup against Supabase instead of local `.seen-urls.json` files. Scored leads sync with `supabase-sync.js`. The `notify.js` script can query HOT leads directly from Supabase when no file is given.
 
-### 4. (Optional) Set up Discogen for company news enrichment
+### 4. (Optional) Set up Parallel.ai for company news enrichment
 
-Discogen enriches target companies with breach news, funding rounds, CISO changes, and compliance signals — used by `account-signals.js --enrich`.
+Parallel.ai is the primary news source for `account-signals.js` — it powers breach, funding, CISO-change, M&A, and compliance-signal research. Used automatically unless you pass `--no-enrich`.
 
-1. Get your API key from [discolike.com](https://discolike.com)
-2. Add to `.env`:
+1. Install the CLI: `npm install -g parallel-web-cli` (or `brew install parallel-web/tap/parallel-cli`). Make sure the npm global bin directory is on your `PATH`, or prefix commands with `PATH="$HOME/.npm-global/bin:$PATH"`.
+2. Authenticate with `parallel-cli login`, or set the key directly in `.env`:
    ```
-   DISCOGEN_API_KEY=your_discogen_key_here
+   PARALLEL_API_KEY=your_parallel_api_key_here
    ```
 
 ### 5. (Optional) Set up research engines for deep prospect research
@@ -113,7 +113,7 @@ LinkedIn:  Step 6: Scan LinkedIn (Jobs / People / Companies / Feed)
                                     ↓
                            Supabase (all signals)
                                     ↓
-                    Step 7: Account Signals + Discogen → Qualify Accounts
+                    Step 7: Account Signals (Parallel.ai/Exa + registries) → Qualify Accounts
                                     ↓
            Step 4: Review  →  Step 5: Enrich  →  Notify HOT Leads
 ```
@@ -559,6 +559,62 @@ Each signal is scored out of 50 based on the Intent Signals Playbook:
 
 ---
 
+## Step 7: Account Signals
+
+**What you're doing:** Taking a CSV of target companies and running them through every signal source at once — news research, breach/compliance registries, job boards, LinkedIn enrichment, and existing local scan data — then scoring, stacking, and ranking them so you know exactly who to contact first.
+
+```bash
+node scripts/account-signals.js target-accounts.csv
+```
+
+**Signal sources fanned out per account:**
+
+| Source | What it finds |
+|--------|---------------|
+| Parallel.ai news (`parallel-news`) | Breach/ransomware, funding, CISO hires, M&A — primary news source, requires `parallel-cli` + `PARALLEL_API_KEY` |
+| Exa.ai news (`exa-news`) | Same categories as Parallel, used as an alternate/secondary provider |
+| HHS OCR breach portal (`hhs-breach`) | Confirmed healthcare breach disclosures |
+| Maine AG breach registry (`maine-ag-breach`) | State-level breach notifications |
+| SEC EDGAR full-text search (`sec-edgar`) | 8-K Item 1.05 breach disclosures, Form D funding filings |
+| ransomware.live (`ransomware-watch`) | Public ransomware victim listings |
+| Job boards (`job-boards`) | Greenhouse/Lever/Ashby postings — competitor tools, compliance frameworks, and CISO/IAM/GRC hiring signals in the JD |
+| Local scans (`local-scans`) | Rolls in existing LinkedIn jobs/people/feed scan data already saved under `data/` |
+
+Each source runs independently — if one fails (missing auth, upstream outage, rate limit), the run keeps going. Failed sources for an account are listed under **"Sources unavailable this run"** in that account's brief instead of crashing the pipeline.
+
+**Options:**
+
+```
+--client <name>      Client config from clients/<name>.json (default: default)
+--min-score <N>      Only include accounts scoring >= N (default: 15)
+--max-companies <N>  Only process the first N accounts from the CSV
+--no-enrich          Skip news/registry/job-board adapters (local data only, faster, free)
+--no-linkedin        Skip LinkedIn Apify company enrichment
+--no-people          Skip decision-maker discovery
+--no-notify          Skip Slack/macOS notifications
+--dry-run            Show the plan without making API calls
+```
+
+**Per-client configuration (`clients/<name>.json`):** Scoring weights (`signalDefs`, with per-type `base` points and `halfLifeDays` decay), signal stacks, tier thresholds, competitor company lists, and news search queries are all defined per client instead of hardcoded. Pass `--client acme` to load `clients/acme.json`; omit it to use `clients/default.json`. Copy `clients/default.json` to start a new client config.
+
+**Supabase schema:** Account signals persist through `supabase/migrations/002_signal_hub.sql` (run it in the SQL Editor after `001_initial_schema.sql`). It adds a normalized `signal_events` table, a `runs` audit table, score snapshots, and feedback fields (`contacted_at`, `replied`, `meeting`, `outcome`) on `companies` for tracking outreach outcomes.
+
+**Where results go:**
+
+```
+data/AccountSignals/<timestamp>/
+├── ranked-accounts.md      ← Tier-sorted report — open this first
+├── ranked-accounts.json    ← Same data, machine-readable
+└── accounts/
+    └── <company-slug>.md   ← Per-account brief: signals, score breakdown, stacks, decision-makers, and any unavailable sources
+```
+
+> **Tip:** Run `--dry-run` first to see which accounts, adapters, and client config will be used without spending any API calls.
+
+> **Tip:** `--no-enrich --no-linkedin --no-people` runs entirely on local data — useful for a fast, free smoke test.
+
+---
+
 ## Getting Notifications for HOT Leads
 
 After Claude scores the leads, run:
@@ -581,7 +637,7 @@ node scripts/notify.js
 
 ## Bonus Tools
 
-### Run all topics at once (with Discogen enrichment)
+### Run all topics at once (with account signal enrichment)
 
 Instead of scraping each topic one by one, run them all:
 
@@ -593,9 +649,9 @@ This reads `scrape-config.json` and runs in order:
 1. All Reddit scrapes (IAM, PAM, DevSecOps, GRC, Governance)
 2. All LinkedIn job + people scans
 3. All LinkedIn feed scans
-4. **Account signals + Discogen enrichment** — if `accountSignalsRun` is set in `scrape-config.json`
+4. **Account signals enrichment** (Parallel.ai/Exa news + registries + job boards) — if `accountSignalsRun` is set in `scrape-config.json`
 
-To enable the Discogen enrichment step, edit `scrape-config.json` and set `"accountSignalsRun"`:
+To enable the account signals step, edit `scrape-config.json` and set `"accountSignalsRun"`:
 ```json
 "accountSignalsRun": {
   "csvFile": "target-accounts.csv",
@@ -764,7 +820,7 @@ Your Project Folder/
 | **Perplexity research returned no results** | The prospect may be too anonymous. The script will still output Reddit-based signals. Try the manual Claude enrichment approach instead. |
 | **"Supabase not configured"** | Add `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` to `.env`. Scripts still work without Supabase — they fall back to local `.seen-urls.json` files. |
 | **Supabase upsert returns 401/403** | Make sure you're using the `service_role` key (not the `anon` key) for write operations. The anon key is read-only. |
-| **"Discogen: DISCOGEN_API_KEY not set"** | Add `DISCOGEN_API_KEY` to `.env`. Account signals still run without it — Discogen enrichment is skipped. |
+| **"parallel-cli failed" / `parallel-cli: command not found`** | Install with `npm install -g parallel-web-cli`, make sure the npm global bin is on `PATH` (or prefix the command with `PATH="$HOME/.npm-global/bin:$PATH"`), then run `parallel-cli login` or set `PARALLEL_API_KEY` in `.env`. The Parallel.ai source shows up under "Sources unavailable this run" in the brief if it's still not authed — it won't crash the run. |
 
 ---
 

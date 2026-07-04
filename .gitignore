@@ -46,6 +46,11 @@ docs/playbook/
 .superpowers/
 docs/superpowers/
 
+# ── Client configs — proprietary per-client playbooks; only the generic default is public ──
+clients/*.json
+!clients/default.json
+!clients/_test_acme.json
+
 # ── OS / editor junk ──
 .DS_Store
 **/.DS_Store

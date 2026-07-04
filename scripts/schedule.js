@@ -173,7 +173,7 @@ async function runAllJobs() {
         }
     }
 
-    // ── Account Signals + Discogen Enrichment ──
+    // ── Account Signals + Parallel.ai/registry Enrichment ──
     if (config.accountSignalsRun && config.accountSignalsRun.csvFile) {
         const run = config.accountSignalsRun;
         console.log(`\n${'='.repeat(50)}`);

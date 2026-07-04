@@ -1,0 +1,81 @@
+{
+  "client": "default",
+  "detectionFloor": 8,
+  "news": {
+    "provider": "parallel",
+    "lookbackDays": 180,
+    "queries": [
+      "\"{company}\" data breach OR ransomware OR security incident",
+      "\"{company}\" CISO appointed OR hires OR \"chief information security officer\"",
+      "\"{company}\" funding OR acquisition OR merger OR \"series b\" OR \"series c\""
+    ]
+  },
+  "signalDefs": {
+    "breach_announced":        { "base": 45, "bonusField": "ciso_identified",      "bonusPts": 5, "halfLifeDays": 30,  "label": "Breach/ransomware announced" },
+    "hiring_ciso_and_iam":     { "base": 42, "bonusField": "competitor_in_jd",     "bonusPts": 5, "halfLifeDays": 45,  "label": "Hiring CISO + simultaneously hiring IAM engineer" },
+    "soc2_and_compliance":     { "base": 40, "bonusField": "vanta_drata_detected", "bonusPts": 3, "halfLifeDays": 60,  "label": "SOC 2 audit in progress + hiring compliance role" },
+    "cyber_insurance_funding": { "base": 38, "bonusField": "security_hire_open",   "bonusPts": 4, "halfLifeDays": 90,  "label": "Cyber insurance trigger + funding event" },
+    "new_ciso_hired":          { "base": 35, "bonusField": "no_iam_vendor",        "bonusPts": 5, "halfLifeDays": 90,  "label": "New CISO hired (within 90 days)" },
+    "funding_bc_soc2":         { "base": 33, "bonusField": "hiring_compliance",    "bonusPts": 4, "halfLifeDays": 90,  "label": "Funding (Series B/C) + SOC 2 pressure" },
+    "competitor_in_jd":        { "base": 32, "bonusField": "multiple_postings",    "bonusPts": 5, "halfLifeDays": 45,  "label": "Competitor tool detected in job posting" },
+    "cloud_migration":         { "base": 28, "bonusField": "security_hire_open",   "bonusPts": 4, "halfLifeDays": 120, "label": "Cloud migration announcement" },
+    "ma_activity":             { "base": 28, "bonusField": "both_in_icp",          "bonusPts": 4, "halfLifeDays": 120, "label": "M&A activity announced" },
+    "hiring_security_grc":     { "base": 25, "bonusField": "compliance_framework", "bonusPts": 3, "halfLifeDays": 45,  "label": "Hiring IT Security/GRC role" },
+    "social_pain_post":        { "base": 22, "bonusField": "person_identified",    "bonusPts": 5, "halfLifeDays": 21,  "label": "Reddit/LinkedIn post about access pain" },
+    "funding_a_only":          { "base": 18, "bonusField": "regulated_industry",   "bonusPts": 5, "halfLifeDays": 90,  "label": "Funding (Series A) only" },
+    "content_consumption":     { "base": 15, "bonusField": "iam_pam_specific",     "bonusPts": 3, "halfLifeDays": 21,  "label": "Content consumption signal" }
+  },
+  "signalStacks": [
+    { "signals": ["breach_announced", "hiring_ciso_and_iam"], "combined": 50, "label": "Breach disclosed + CISO role open",               "meaning": "In crisis mode AND rebuilding — perfect" },
+    { "signals": ["new_ciso_hired", "competitor_in_jd"],       "combined": 47, "label": "New CISO hired + CyberArk/SailPoint job posting", "meaning": "New leader auditing the stack, budget confirmed" },
+    { "signals": ["soc2_and_compliance", "funding_bc_soc2"],   "combined": 45, "label": "SOC 2 in progress + Vanta in JD + Series B",      "meaning": "Classic mid-market compliance-driven buyer" },
+    { "signals": ["ma_activity", "hiring_security_grc"],       "combined": 43, "label": "PE acquisition + IAM/GRC role opening",           "meaning": "PE firm mandating controls post-acquisition" },
+    { "signals": ["breach_announced", "hiring_security_grc"],  "combined": 43, "label": "HIPAA breach + hiring compliance manager",        "meaning": "Remediation mode = urgent buyer" },
+    { "signals": ["funding_bc_soc2", "soc2_and_compliance"],   "combined": 40, "label": "Series C + enterprise customer demanding SOC 2",  "meaning": "Pipeline pressure = budget pressure" },
+    { "signals": ["hiring_security_grc", "competitor_in_jd"],  "combined": 40, "label": "CMMC requirement + PAM job posting",              "meaning": "Federal contract at risk = non-negotiable buy" },
+    { "signals": ["hiring_security_grc", "social_pain_post"],  "combined": 38, "label": "Hiring access management + LinkedIn pain post",   "meaning": "Problem confirmed at person level" }
+  ],
+  "tiers": [
+    { "min": 35, "tier": "CRITICAL", "action": "24-48hr outreach",        "emoji": "🔴" },
+    { "min": 28, "tier": "HIGH",     "action": "3-day / week 1 outreach", "emoji": "🟠" },
+    { "min": 22, "tier": "MEDIUM",   "action": "Next batch",              "emoji": "🟡" },
+    { "min": 15, "tier": "LOW",      "action": "Monitor list",            "emoji": "🟢" }
+  ],
+  "competitorCompanies": [
+    { "name": "cyberark",       "slugs": ["cyberark"] },
+    { "name": "beyondtrust",    "slugs": ["beyondtrust"] },
+    { "name": "delinea",        "slugs": ["delinea"] },
+    { "name": "thycotic",       "slugs": ["thycotic"] },
+    { "name": "centrify",       "slugs": ["centrify"] },
+    { "name": "balabit",        "slugs": ["balabit", "one-identity"] },
+    { "name": "sailpoint",      "slugs": ["sailpoint"] },
+    { "name": "saviynt",        "slugs": ["saviynt"] },
+    { "name": "one identity",   "slugs": ["oneidentity", "one-identity"] },
+    { "name": "okta",           "slugs": ["okta", "okta-inc"] },
+    { "name": "ping identity",  "slugs": ["pingidentity", "ping-identity"] },
+    { "name": "auth0",          "slugs": ["auth0"] },
+    { "name": "forgerock",      "slugs": ["forgerock"] },
+    { "name": "vanta",          "slugs": ["vanta"] },
+    { "name": "drata",          "slugs": ["drata"] },
+    { "name": "secureframe",    "slugs": ["secureframe"] },
+    { "name": "crowdstrike",    "slugs": ["crowdstrike"] },
+    { "name": "palo alto networks", "slugs": ["palo-alto-networks"] },
+    { "name": "zscaler",        "slugs": ["zscaler"] },
+    { "name": "hashicorp",      "slugs": ["hashicorp"] },
+    { "name": "wallix",         "slugs": ["wallix"] },
+    { "name": "senhasegura",    "slugs": ["senhasegura"] },
+    { "name": "arcon",          "slugs": ["arcon"] },
+    { "name": "strongdm",       "slugs": ["strongdm"] },
+    { "name": "omada identity", "slugs": ["omada", "omada-identity"] }
+  ],
+  "jd": {
+    "competitorTools": ["okta", "sailpoint", "cyberark", "beyondtrust", "delinea", "ping identity", "onelogin", "saviynt", "forgerock", "auth0", "vanta", "drata", "secureauth", "centrify", "thales", "microsoft entra", "azure ad", "active directory", "thycotic", "wallix", "senhasegura", "arcon", "krontech", "oracle identity", "ibm isim", "ibm igm", "quest one identity", "omada identity", "hashicorp vault", "conjur", "akeyless", "doppler", "infisical", "ermetic", "sonrai security"],
+    "frameworks": ["soc 2", "soc2", "iso 27001", "hipaa", "cmmc", "nist", "pci dss", "pci-dss", "fedramp", "gdpr", "ccpa", "sox", "nist 800-53", "nist csf", "cis controls", "cobit", "nerc cip", "rbi", "sebi", "nist 800-207", "nist sp 800-63", "iec 62443", "tisax", "fisma", "itar", "swift cscf"],
+    "painKeywords": ["manual processes", "lack of visibility", "access sprawl", "identity sprawl", "no automation", "spreadsheet", "technical debt", "audit findings", "audit requirements", "security gap", "compliance gap", "too many accounts", "offboarding", "orphaned accounts", "access reviews", "rubber stamping", "over-provisioned", "unmanaged service accounts", "shared credentials", "shared admin accounts", "privileged account sprawl", "hardcoded credentials", "hardcoded passwords", "excessive privileges", "standing privileges", "standing access", "lateral movement risk", "credential theft", "insider threat", "third-party vendor risk", "no audit trail", "manual access reviews", "access recertification", "entitlement sprawl", "zero trust initiative", "zero trust roadmap", "implementing zero trust"]
+  },
+  "people": {
+    "roles": ["CISO", "Chief Information Security Officer", "Head of IAM", "Director of Identity", "VP Security", "Director of Information Security"],
+    "max": 5
+  },
+  "notify": { "slack": true, "macos": true }
+}

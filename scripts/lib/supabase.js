@@ -263,4 +263,54 @@ function isConfigured() {
     return !!(SUPABASE_URL && SUPABASE_KEY);
 }
 
-export default { select, insert, upsert, update, exists, findOrCreateCompany, isConfigured };
+// ── Shape a companies row (shared by both findOrCreate paths) ──
+export function buildCompanyRow(companyData) {
+    const now = new Date().toISOString();
+    return {
+        name:           companyData.name || null,
+        domain:         companyData.domain || null,
+        linkedin_url:   companyData.linkedin_url || null,
+        website:        companyData.website || null,
+        industry:       companyData.industry || null,
+        employee_count: companyData.employee_count || null,
+        segment:        companyData.segment || null,
+        location:       companyData.location || null,
+        updated_at:     now,
+        last_seen_at:   now
+    };
+}
+
+// ── FIND OR CREATE by domain (canonical key), fallback to linkedin_url ──
+// Companies created by other scripts (e.g. linkedin-companies.js) are keyed on
+// linkedin_url with domain NULL. Upserting straight onto 'domain' would insert
+// a second row sharing that same linkedin_url and 409 on its unique constraint.
+// So: look up by domain first, then by linkedin_url (reconciling that row by
+// setting its domain), and only insert fresh when neither key matches.
+async function findOrCreateCompanyByDomain(companyData) {
+    assertConfigured();
+    if (!companyData.domain) return findOrCreateCompany(companyData);
+
+    const byDomain = await select('companies', { domain: `eq.${companyData.domain}`, select: 'id', limit: 1 });
+    if (byDomain.length > 0) {
+        const id = byDomain[0].id;
+        await update('companies', { id: `eq.${id}` }, buildCompanyRow(companyData));
+        return id;
+    }
+
+    if (companyData.linkedin_url) {
+        const byLinkedin = await select('companies', { linkedin_url: `eq.${companyData.linkedin_url}`, select: 'id', limit: 1 });
+        if (byLinkedin.length > 0) {
+            const id = byLinkedin[0].id;
+            await update('companies', { id: `eq.${id}` }, buildCompanyRow(companyData));
+            return id;
+        }
+    }
+
+    const rows = await upsert('companies', buildCompanyRow(companyData), 'domain');
+    if (rows.length > 0) return rows[0].id;
+    const existing = await select('companies', { domain: `eq.${companyData.domain}`, select: 'id', limit: 1 });
+    if (existing.length > 0) return existing[0].id;
+    throw new Error(`Failed to find or create company by domain: ${companyData.domain}`);
+}
+
+export default { select, insert, upsert, update, exists, findOrCreateCompany, findOrCreateCompanyByDomain, isConfigured };

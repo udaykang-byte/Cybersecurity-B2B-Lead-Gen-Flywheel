@@ -1,0 +1,4 @@
+[ { "victim": "Acme Corp", "group": "lockbit4", "discovered": "2026-06-25T08:00:00.373448+00:00",
+    "attackdate": "2026-06-24T00:00:00+00:00", "country": "US", "activity": "Manufacturing",
+    "domain": "acme.test",
+    "url": "https://www.ransomware.live/id/QWNtZSBDb3JwL2xvY2tiaXQ0" } ]

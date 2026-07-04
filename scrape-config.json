@@ -100,7 +100,7 @@
     "csvFile": "target-accounts.csv",
     "enrich": true,
     "maxCompanies": 20,
-    "_note": "Runs account-signals.js with Discogen enrichment after all scrapes. Remove or set enrich:false to skip Discogen API calls."
+    "_note": "Runs account-signals.js with Parallel.ai/registry enrichment after all scrapes. Remove or set enrich:false to skip news/registry API calls."
   },
   "linkedinFeedScans": [
     {

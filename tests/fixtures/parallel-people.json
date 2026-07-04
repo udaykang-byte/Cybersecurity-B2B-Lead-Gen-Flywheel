@@ -1,0 +1,13 @@
+{
+  "results": [
+    { "title": "Jane Doe - Chief Information Security Officer - Acme Corp | LinkedIn",
+      "url": "https://www.linkedin.com/in/janedoe?originalSubdomain=us",
+      "excerpt": "CISO at Acme Corp. Leading identity and access programs." },
+    { "title": "John Roe - Director of Identity - Acme Corp | LinkedIn",
+      "url": "https://www.linkedin.com/in/johnroe",
+      "excerpt": "Identity and access management leadership." },
+    { "title": "Acme Corp | LinkedIn",
+      "url": "https://www.linkedin.com/company/acme-corp",
+      "excerpt": "Company page — must be filtered (not /in/)." }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "results": [
+    { "title": "Okta discloses security incident affecting support system",
+      "url": "https://example-news.test/okta-breach",
+      "excerpt": "Okta said attackers compromised its support case management system.",
+      "publishedDate": "2026-05-14" },
+    { "title": "Okta appoints new CISO after review",
+      "url": "https://example-news.test/okta-ciso",
+      "excerpt": "Okta names Jane Doe as chief information security officer.",
+      "publishedDate": "2026-06-02" },
+    { "title": "Unrelated: Globex opens new office",
+      "url": "https://example-news.test/globex",
+      "excerpt": "Globex Corporation expands.",
+      "publishedDate": "2026-06-10" }
+  ]
+}
