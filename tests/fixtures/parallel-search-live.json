@@ -1,0 +1,32 @@
+{
+  "search_id": "search_f1890734eb444b398b6b9971574840a8",
+  "session_id": "session_f1890734eb444b398b6b9971574840a8",
+  "status": "ok",
+  "results": [
+    {
+      "url": "https://example-news.test/okta-support-breach",
+      "title": "Okta discloses security incident affecting support system",
+      "publish_date": "2026-05-14",
+      "excerpts": [
+        "Okta said attackers compromised its support case management system.",
+        "The company is notifying affected customers."
+      ]
+    },
+    {
+      "url": "https://example-news.test/okta-new-ciso",
+      "title": "Okta appoints new CISO after review",
+      "publish_date": "2026-06-02",
+      "excerpts": [
+        "Okta names Jane Doe as chief information security officer."
+      ]
+    },
+    {
+      "url": "https://example-news.test/globex-office",
+      "title": "Unrelated: Globex opens new office",
+      "publish_date": "2026-06-10",
+      "excerpts": [
+        "Globex Corporation expands."
+      ]
+    }
+  ]
+}

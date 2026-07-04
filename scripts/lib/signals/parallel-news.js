@@ -18,14 +18,17 @@ export function parseResults(stdout) {
     const list = Array.isArray(data) ? data : data.results || data.items || data.data || [];
     return list.map(r => ({
         title: r.title || '',
-        snippet: r.excerpt || r.snippet || r.text || r.summary || '',
+        snippet: r.excerpt || r.snippet || r.text || r.summary ||
+            (Array.isArray(r.excerpts) ? r.excerpts.join(' ') : ''),
         url: r.url || r.link || null,
-        publishedAt: r.publishedDate || r.published_date || r.date || null
+        publishedAt: r.publishedDate || r.published_date || r.publish_date || r.date || null
     }));
 }
 
 async function runCli(args) {
-    const { stdout } = await pExecFile('parallel-cli', args, { timeout: 60000, maxBuffer: 4 * 1024 * 1024 });
+    // PARALLEL_CLI overrides the binary path when parallel-cli is not on PATH
+    const cli = process.env.PARALLEL_CLI || 'parallel-cli';
+    const { stdout } = await pExecFile(cli, args, { timeout: 60000, maxBuffer: 4 * 1024 * 1024 });
     return stdout;
 }
 
