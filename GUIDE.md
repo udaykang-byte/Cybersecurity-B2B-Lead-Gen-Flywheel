@@ -60,7 +60,10 @@ Supabase stores all scraped data, scored leads, and signals in one place — ena
 
 Parallel.ai is the primary news source for `account-signals.js` — it powers breach, funding, CISO-change, M&A, and compliance-signal research. Used automatically unless you pass `--no-enrich`.
 
-1. Install the CLI: `npm install -g parallel-web-cli` (or `brew install parallel-web/tap/parallel-cli`). Make sure the npm global bin directory is on your `PATH`, or prefix commands with `PATH="$HOME/.npm-global/bin:$PATH"`.
+1. Install the CLI: `npm install -g parallel-web-cli` (or `brew install parallel-web/tap/parallel-cli`). If the npm global bin directory isn't on your `PATH`, point the adapter at the binary in `.env` instead:
+   ```
+   PARALLEL_CLI=/absolute/path/to/parallel-cli   # e.g. ~/.npm-global/bin/parallel-cli
+   ```
 2. Authenticate with `parallel-cli login`, or set the key directly in `.env`:
    ```
    PARALLEL_API_KEY=your_parallel_api_key_here
@@ -574,7 +577,7 @@ node scripts/account-signals.js target-accounts.csv
 | Parallel.ai news (`parallel-news`) | Breach/ransomware, funding, CISO hires, M&A — primary news source, requires `parallel-cli` + `PARALLEL_API_KEY` |
 | Exa.ai news (`exa-news`) | Same categories as Parallel, used as an alternate/secondary provider |
 | HHS OCR breach portal (`hhs-breach`) | Confirmed healthcare breach disclosures |
-| Maine AG breach registry (`maine-ag-breach`) | State-level breach notifications |
+| Maine AG breach registry (`maine-ag-breach`) | State-level breach notifications (upstream database offline since mid-2026 — reported under "Sources unavailable" until it returns) |
 | SEC EDGAR full-text search (`sec-edgar`) | 8-K Item 1.05 breach disclosures, Form D funding filings |
 | ransomware.live (`ransomware-watch`) | Public ransomware victim listings |
 | Job boards (`job-boards`) | Greenhouse/Lever/Ashby postings — competitor tools, compliance frameworks, and CISO/IAM/GRC hiring signals in the JD |
@@ -820,7 +823,7 @@ Your Project Folder/
 | **Perplexity research returned no results** | The prospect may be too anonymous. The script will still output Reddit-based signals. Try the manual Claude enrichment approach instead. |
 | **"Supabase not configured"** | Add `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` to `.env`. Scripts still work without Supabase — they fall back to local `.seen-urls.json` files. |
 | **Supabase upsert returns 401/403** | Make sure you're using the `service_role` key (not the `anon` key) for write operations. The anon key is read-only. |
-| **"parallel-cli failed" / `parallel-cli: command not found`** | Install with `npm install -g parallel-web-cli`, make sure the npm global bin is on `PATH` (or prefix the command with `PATH="$HOME/.npm-global/bin:$PATH"`), then run `parallel-cli login` or set `PARALLEL_API_KEY` in `.env`. The Parallel.ai source shows up under "Sources unavailable this run" in the brief if it's still not authed — it won't crash the run. |
+| **"parallel-cli failed" / `parallel-cli: command not found`** | Install with `npm install -g parallel-web-cli`. If the npm global bin isn't on `PATH`, set `PARALLEL_CLI=/path/to/parallel-cli` in `.env`. Then run `parallel-cli login` or set `PARALLEL_API_KEY` in `.env`. The Parallel.ai source shows up under "Sources unavailable this run" in the brief if it's still not authed — it won't crash the run. |
 
 ---
 
